@@ -1,0 +1,19 @@
+{
+  "name": "bitnorm_backend",
+  "version": "0.1.0",
+  "description": "BitNorm web application backend code.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/bitnorm/backend.git"
+  },
+  "author": "cryarchy <crystalflow.mwangi@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/bitnorm/backend/issues"
+  },
+  "homepage": "https://gitlab.com/bitnorm/backend#readme"
+}
