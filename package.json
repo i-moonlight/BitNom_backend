@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://gitlab.com/bitnorm/backend/issues"
   },
-  "homepage": "https://gitlab.com/bitnorm/backend#readme"
+  "homepage": "https://gitlab.com/bitnorm/backend#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
 }
