@@ -1,9 +1,32 @@
 "use strict";
 
 const express = require("express");
+const graphqlHTTP = require("express-graphql");
+const mongoose = require("mongoose");
+
 const app = express();
-const port = 3000;
+
+const config = process.env.PRODUCTION
+	? require("./config").production
+	: require("./config").development;
+
+const graphqlSchema = require("./schema");
+
+mongoose.connect(
+	config.dbUrl,
+	{ useNewUrlParser: true }
+);
+
+app.use(
+	"/graphql",
+	graphqlHTTP({
+		schema: graphqlSchema,
+		graphiql: config.graphiql
+	})
+);
 
 app.get("/", (req, res) => res.send("Hello World!"));
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.listen(config.port, () =>
+	console.log(`Example app listening on port ${config.port}!`)
+);
