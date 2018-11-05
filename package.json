@@ -17,9 +17,13 @@
   },
   "homepage": "https://gitlab.com/bitnorm/backend#readme",
   "dependencies": {
+    "bcrypt": "^3.0.2",
     "express": "^4.16.4",
     "express-graphql": "^0.7.1",
     "graphql": "^14.0.2",
-    "mongoose": "^5.3.8"
+    "jsonwebtoken": "^8.3.0",
+    "mongoose": "^5.3.8",
+    "randomstring": "^1.1.5",
+    "validator": "^10.8.0"
   }
 }

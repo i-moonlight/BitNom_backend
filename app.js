@@ -14,7 +14,10 @@ const graphqlSchema = require("./schema");
 
 mongoose.connect(
 	config.dbUrl,
-	{ useNewUrlParser: true }
+	{
+		useCreateIndex: true,
+		useNewUrlParser: true
+	}
 );
 
 app.use(

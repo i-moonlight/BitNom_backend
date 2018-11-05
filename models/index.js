@@ -10,6 +10,7 @@ ObjectId.prototype.valueOf = function() {
 
 module.exports = () => {
 	// register models
-	mongoose.model("Complete", require("./coin"));
-	mongoose.model("Partial", require("./coin"));
+	require("./coin");
+	require("./user");
+	require("./access-group");
 };

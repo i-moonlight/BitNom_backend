@@ -8,8 +8,8 @@ const {
 	GraphQLNonNull
 } = require("graphql");
 
-const coinInterface = require("./coin");
-const githubType = require("./github");
+const coinInterface = require("./coin-interface");
+const githubType = require("./github-type");
 
 module.exports = new GraphQLObjectType({
 	name: "Complete",
@@ -50,11 +50,11 @@ module.exports = new GraphQLObjectType({
 				description: "The link to the topic's initiator's profile."
 			},
 			replies: {
-				type: GraphQLString,
+				type: GraphQLInt,
 				description: "The number of replies made to the topic."
 			},
 			views: {
-				type: GraphQLString,
+				type: GraphQLInt,
 				description: "The number of views the topic has received."
 			},
 			lastPostDate: {
@@ -72,5 +72,6 @@ module.exports = new GraphQLObjectType({
 			}
 		};
 	},
-	interfaces: [coinInterface]
+	interfaces: [coinInterface],
+	types: [githubType]
 });
