@@ -1,11 +1,16 @@
 mutation createGroup(
-	$name: String = "admin",
-	$collections: [PermissionsInput]
+	$name: String = "maintainer",
+  $permissions: [PermissionsInput]! = [
+    { name: "User", create: true, read: true, update: true, delete: true },
+    {
+      name: "AccessGroup", create: false, read: true, update: false, delete: false
+    }
+  ]
 ) {
 	accessGroup {
 		create(
 			name: $name
-			permissions: $collections
+			permissions: $permissions
 		) {
 			_id
 			name
@@ -17,7 +22,7 @@ mutation createGroup(
 }
 
 query getGroups(
-	$name: String = "admin",
+	$name: String = "",
 	$_id: String = "",
 	$pagination: PaginationInput = {
 		limit: 20,
@@ -37,7 +42,7 @@ query getGroups(
 }
 
 mutation createUser(
-	$email: String = "example@email.com",
+	$email: String = "example2@email.com",
 	$password: String = "password"
 ) {
 	user {
@@ -48,7 +53,7 @@ mutation createUser(
 }
 
 query getUser(
-	$email: String = "example@email.com",
+	$email: String = "",
 	$_id: String = "",
 	$pagination: PaginationInput = {
 		limit: 20,
@@ -63,7 +68,7 @@ query getUser(
 }
 
 query searchUser(
-	$searchString: String = "example user"
+	$searchString: String = "example example1"
 	$pagination: PaginationInput = {
 		limit: 20,
 		skip: 0
@@ -74,6 +79,13 @@ query searchUser(
 			_id displayName email avatar access
 		}
 	}
+}
+
+query login(
+  $email: String! = "example@email.com",
+  $password:String! = "password"
+) {
+  login(email: $email, password: $password)
 }
 
 query getCoin(
@@ -98,7 +110,7 @@ query getCoin(
 }
 
 query searchCoin(
-	$searchString: String = "monero"
+	$searchString: String = "doge"
 	$pagination: PaginationInput = {
 		limit: 20,
 		skip: 0
