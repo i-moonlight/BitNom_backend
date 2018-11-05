@@ -8,40 +8,40 @@ module.exports = new GraphQLObjectType({
 	fields() {
 		return {
 			watch: {
-				type: GraphQLString,
+				type: GraphQLInt,
 				description: "The watches received by the coin's repository."
 			},
 			stars: {
-				type: GraphQLString,
+				type: GraphQLInt,
 				description: "The stars received by the coin's repository."
 			},
 			forks: {
-				type: GraphQLString,
+				type: GraphQLInt,
 				description: "The forks received by the coin's repository."
 			},
 			issues: {
-				type: GraphQLString,
+				type: GraphQLInt,
 				description: "The issues made on the coin's repository."
 			},
 			pulls: {
-				type: GraphQLString,
+				type: GraphQLInt,
 				description:
 					"The pull requests received by the coin's repository."
 			},
 			commits: {
-				type: GraphQLString,
+				type: GraphQLInt,
 				description: "The commits made to the coin's repository."
 			},
 			branches: {
-				type: GraphQLString,
+				type: GraphQLInt,
 				description: "The branches on the coin's repository."
 			},
 			releases: {
-				type: GraphQLString,
+				type: GraphQLInt,
 				description: "The releases on the coin's repository."
 			},
 			contributors: {
-				type: GraphQLString,
+				type: GraphQLInt,
 				description: "The contributers to the coin's repository."
 			},
 			repository: {

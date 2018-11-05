@@ -3,7 +3,7 @@
 const mongoose = require("mongoose");
 
 // define the schema
-module.exports = mongoose.Schema({
+const schema = mongoose.Schema({
 	// fields
 	coinName: { type: String },
 	abbreviation: { type: String },
@@ -29,3 +29,8 @@ module.exports = mongoose.Schema({
 		repository: { type: String }
 	}
 });
+
+schema.index({ coinName: "text", topicName: "text" });
+
+mongoose.model("Complete", schema);
+mongoose.model("Partial", schema);

@@ -1,20 +1,30 @@
 "use strict";
 
 const {
-	GraphQLObjectType,
+	GraphQLInterfaceType,
 	GraphQLString,
 	GraphQLInt,
 	GraphQLID,
 	GraphQLNonNull
 } = require("graphql");
 
-const githubType = require("./github");
-const coinInterface = require("./coin");
+const githubType = require("./github-type");
 
-module.exports = new GraphQLObjectType({
-	name: "Partial",
-	description: "A cryptocurrency coin with some fields missing.",
-	fields: () => ({
+function hasEmptyField(obj) {
+	if (!obj) return true;
+	Object.keys(obj).map(key => {
+		let val = obj[key];
+		if (val === "" || val === null || val === undefined) {
+			return true;
+		}
+	});
+	return false;
+}
+
+module.exports = new GraphQLInterfaceType({
+	name: "Coin",
+	description: "A cryptocurrency coin",
+	fields: {
 		_id: {
 			type: GraphQLNonNull(GraphQLString),
 			description: "The coin's auto-assigned database ID."
@@ -49,11 +59,11 @@ module.exports = new GraphQLObjectType({
 			description: "The link to the topic's initiator's profile."
 		},
 		replies: {
-			type: GraphQLString,
+			type: GraphQLInt,
 			description: "The number of replies made to the topic."
 		},
 		views: {
-			type: GraphQLString,
+			type: GraphQLInt,
 			description: "The number of views the topic has received."
 		},
 		lastPostDate: {
@@ -68,6 +78,13 @@ module.exports = new GraphQLObjectType({
 			type: githubType,
 			description: "The github statistics of the coin."
 		}
-	}),
-	interfaces: [coinInterface]
+	},
+	resolveType(coin) {
+		coin = coin.toObject();
+		if (hasEmptyField(coin) || hasEmptyField(coin.github)) {
+			return require("./partial-type");
+		}
+		return require("./complete-type");
+	},
+	types: [githubType]
 });

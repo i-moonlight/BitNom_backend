@@ -3,43 +3,65 @@
 const {
 	GraphQLSchema,
 	GraphQLObjectType,
+	GraphQLNonNull,
 	GraphQLString,
 	GraphQLList,
 	GraphQLBoolean
 } = require("graphql");
 
 require("../models")();
-const Coin = require("../api/coin");
+const { Coin, User, login, AccessGroup } = require("../api");
 
-const coinInterface = require("./coin");
-const githubType = require("./github");
-const completeType = require("./complete");
-const partialType = require("./partial");
+const { coinQuery, completeType, partialType } = require("./coin");
+const { userQuery, userMutation } = require("./user");
+const { accessGroupQuery, accessGroupMutation } = require("./access-group");
 
 module.exports = new GraphQLSchema({
 	query: new GraphQLObjectType({
 		name: "RootQueryType",
 		fields: {
-			hello: {
-				type: GraphQLString,
-				resolve() {
-					return "Hello, world!";
-				}
+			accessGroup: {
+				type: accessGroupQuery,
+				resolve: () => AccessGroup
+			},
+			user: {
+				type: userQuery,
+				resolve: () => User
 			},
 			coin: {
-				type: GraphQLList(coinInterface),
+				type: coinQuery,
+				resolve: () => Coin
+			},
+			login: {
+				type: GraphQLString,
 				args: {
-					partials: {
-						type: GraphQLBoolean,
-						description:
-							"Specifies if the fetch is from the Partials collection."
+					email: {
+						type: GraphQLNonNull(GraphQLString),
+						description: "A user provided email."
+					},
+					password: {
+						type: GraphQLNonNull(GraphQLString),
+						description: "The user's password."
 					}
 				},
-				async resolve(root, { partials }) {
-					return Coin.get({ partials });
+				resolve: (root, { email, password }) => {
+					return login({ email, password });
 				}
 			}
 		}
 	}),
-	types: [partialType, completeType, githubType]
+	mutation: new GraphQLObjectType({
+		name: "RootMutationType",
+		fields: {
+			accessGroup: {
+				type: accessGroupMutation,
+				resolve: () => AccessGroup
+			},
+			user: {
+				type: userMutation,
+				resolve: () => User
+			}
+		}
+	}),
+	types: [completeType, partialType]
 });
