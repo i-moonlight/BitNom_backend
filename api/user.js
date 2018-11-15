@@ -31,5 +31,57 @@ module.exports = {
 			verificationString: randomstring.generate(8)
 		};
 		return mongoose.model("User").create(user);
+	},
+	delete({ ids }) {
+		return mongoose
+			.model("User")
+			.deleteMany({ _id: { $in: ids } })
+			.then(() => ids);
+	},
+	changePassword({ oldPassword, newPassword, confirmPassword }, req) {
+		return Promise.resolve()
+			.then(() => req.user.isPassword(oldPassword))
+			.then(matches => {
+				if (!matches)
+					throw new Error(
+						"Provided password does not match your old password!"
+					);
+				if (newPassword !== oldPassword)
+					throw new Error("Provided passwords do not match!");
+				req.user.password = newPassword;
+				return req.user.save().then(() => "ok");
+			});
+	},
+	resetPassword({ email }) {
+		return mongoose
+			.model("User")
+			.findOne({ email })
+			.then(user => {
+				if (user === null)
+					throw new Error(
+						"No user was found using the provided email."
+					);
+				const password = randomstring.generate(8);
+				user.password = password;
+				console.log(`Sending ${password} via reset password email.`);
+				return user.save().then(() => "ok");
+			});
+	},
+	updateAccessGroup({ _id, accessGroup }, req) {
+		return Promise.resolve().then(() => {
+			return mongoose
+				.model("User")
+				.findOneAndUpdate(
+					{ _id },
+					{ access: accessGroup },
+					{ new: true }
+				);
+		});
+	},
+	updateDisplayName({ displayName }, req) {
+		return Promise.resolve().then(() => {
+			req.user.displayName = displayName;
+			return req.user.save();
+		});
 	}
 };
