@@ -13,4 +13,6 @@ module.exports = () => {
 	require("./coin");
 	require("./user");
 	require("./access-group");
+	require("./vote");
+	require("./technology");
 };

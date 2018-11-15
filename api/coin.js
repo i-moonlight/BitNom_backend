@@ -20,5 +20,13 @@ module.exports = {
 			.find({ $text: { $search: searchString } })
 			.limit(pagination.limit)
 			.skip(pagination.skip);
+	},
+	vote({ invoiceId, user, candidate, amount }) {
+		return mongoose
+			.model("Vote")
+			.create({ invoiceId, user, candidate, amount, date: new Date() });
+	},
+	votes({ candidate }) {
+		return mongoose.model("Vote").find({ candidate });
 	}
 };

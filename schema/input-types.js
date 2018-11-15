@@ -5,7 +5,8 @@ const {
 	GraphQLInt,
 	GraphQLString,
 	GraphQLBoolean,
-	GraphQLNonNull
+	GraphQLNonNull,
+	GraphQLList
 } = require("graphql");
 
 const paginationInput = new GraphQLInputObjectType({
@@ -57,4 +58,44 @@ const permissionsInput = new GraphQLInputObjectType({
 	})
 });
 
-module.exports = { paginationInput, permissionsInput };
+const technologyInput = new GraphQLInputObjectType({
+	name: "TechnologyInput",
+	description: "Input fields for a technology",
+	fields: () => ({
+		name: {
+			type: GraphQLString,
+			description: "The technology's name"
+		},
+		focus: {
+			type: GraphQLString,
+			description: "The area of focus of the technology."
+		},
+		description: {
+			type: GraphQLString,
+			description:
+				"A brief description of the technology's aims and targeted solutions."
+		},
+		tags: {
+			type: GraphQLList(GraphQLString),
+			description: "Tags that can be associated with the technology."
+		},
+		features: {
+			type: GraphQLList(GraphQLString),
+			description: "Features available in the technology."
+		},
+		innovations: {
+			type: GraphQLList(GraphQLString),
+			description: "Innovations made by the technology."
+		},
+		repository: {
+			type: GraphQLString,
+			description: "The Git repository of the technology"
+		},
+		website: {
+			type: GraphQLString,
+			description: "The link to the technology's official website."
+		}
+	})
+});
+
+module.exports = { paginationInput, permissionsInput, technologyInput };

@@ -5,7 +5,8 @@ const {
 	GraphQLList,
 	GraphQLBoolean,
 	GraphQLNonNull,
-	GraphQLString
+	GraphQLString,
+	GraphQLFloat
 } = require("graphql");
 
 const { paginationInput } = require("../input-types");
@@ -13,6 +14,7 @@ const { paginationInput } = require("../input-types");
 const coinInterface = require("./coin-interface");
 const completeType = require("./complete-type");
 const partialType = require("./partial-type");
+const voteType = require("../vote-type");
 
 const coinQuery = new GraphQLObjectType({
 	name: "CoinQuery",
@@ -49,8 +51,57 @@ const coinQuery = new GraphQLObjectType({
 				},
 				pagination: { type: GraphQLNonNull(paginationInput) }
 			}
+		},
+		votes: {
+			type: GraphQLList(voteType),
+			description:
+				"A function to get the votes cast for a given coin or technology",
+			args: {
+				candidate: {
+					type: GraphQLString,
+					description:
+						"The ID of the technology or coin whose votes are of interest."
+				}
+			}
 		}
 	})
 });
 
-module.exports = { coinQuery, completeType, partialType };
+const coinMutation = new GraphQLObjectType({
+	name: "CoinMutation",
+	description: "Functions to create, update and delete coin information.",
+	fields: () => ({
+		vote: {
+			type: voteType,
+			description: "Cast a vote for a technology or coin.",
+			args: {
+				invoiceId: {
+					type: GraphQLString,
+					description:
+						"The ID of the invoice used to make the donation."
+				},
+				user: {
+					type: GraphQLString,
+					description: "An ID identifying the donating user."
+				},
+				candidate: {
+					type: GraphQLString,
+					description:
+						"The ID of the technology or coin being voted on."
+				},
+				amount: {
+					type: GraphQLFloat,
+					description: "The amount in Satoshis of the donation."
+				}
+			}
+		}
+	})
+});
+
+module.exports = {
+	coinQuery,
+	coinMutation,
+	completeType,
+	partialType,
+	voteType
+};

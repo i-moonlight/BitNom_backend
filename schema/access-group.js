@@ -99,6 +99,51 @@ const accessGroupMutation = new GraphQLObjectType({
 					type: GraphQLNonNull(GraphQLList(permissionsInput))
 				}
 			}
+		},
+		delete: {
+			type: GraphQLList(GraphQLString),
+			description: "Delete access groups by specifying their IDs.",
+			args: {
+				ids: {
+					type: GraphQLList(GraphQLString),
+					description:
+						"An array containing the IDs of the access groups to be deleted."
+				}
+			}
+		},
+		deletePermission: {
+			type: accessGroupType,
+			description: "Delete a permission from an access group.",
+			args: {
+				_id: {
+					type: GraphQLString,
+					description: "The ID of the target access group."
+				},
+				permissionId: {
+					type: GraphQLString,
+					description: "The ID of the permission to be deleted."
+				}
+			}
+		},
+		update: {
+			type: accessGroupType,
+			description:
+				"Update the name of a or permissions in an access group.",
+			args: {
+				_id: {
+					type: GraphQLString,
+					description: "The ID of the target access group."
+				},
+				name: {
+					type: GraphQLString,
+					description: "The new name of the access group."
+				},
+				permission: {
+					type: GraphQLNonNull(permissionsInput),
+					description:
+						"The new permissions. NOTE: The name is not updateable."
+				}
+			}
 		}
 	}),
 	types: [accessGroupType]

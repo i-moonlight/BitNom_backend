@@ -96,6 +96,70 @@ const userMutation = new GraphQLObjectType({
 					description: `A password to authenticate the user.`
 				}
 			}
+		},
+		changePassword: {
+			type: GraphQLString,
+			description: "Change a user's password",
+			args: {
+				oldPassword: {
+					type: GraphQLString,
+					description: "The user's old password."
+				},
+				newPassword: {
+					type: GraphQLString,
+					description: "The user's new password."
+				},
+				confirmPassword: {
+					type: GraphQLString,
+					description:
+						"A second string that should match the new password."
+				}
+			}
+		},
+		updateDisplayName: {
+			type: userType,
+			description: "Update the display name of a given user.",
+			args: {
+				displayName: {
+					type: GraphQLString,
+					description: "The new display name of the user."
+				}
+			}
+		},
+		updateAccessGroup: {
+			type: userType,
+			description: "Update the access group of a given user.",
+			args: {
+				_id: {
+					type: GraphQLString,
+					description: "The ID to be used to fetch the user."
+				},
+				accessGroup: {
+					type: GraphQLString,
+					description: "The ID of the user's new access group."
+				}
+			}
+		},
+		resetPassword: {
+			type: GraphQLString,
+			description: "Reset the password for a given user.",
+			args: {
+				email: {
+					type: GraphQLString,
+					description: "The email to be used to identify the user."
+				}
+			}
+		},
+		delete: {
+			type: GraphQLList(GraphQLString),
+			description: "Delete a users by specifying their IDs.",
+			args: {
+				ids: {
+					type: GraphQLList(GraphQLString),
+					description:
+						"An array containing the IDs of the users to be deleted."
+				}
+			}
 		}
 	}),
 	types: [userType]
