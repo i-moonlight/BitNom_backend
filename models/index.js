@@ -15,4 +15,5 @@ module.exports = () => {
 	require("./access-group");
 	require("./vote");
 	require("./technology");
+	require("./source-code");
 };
