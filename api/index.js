@@ -5,5 +5,6 @@ module.exports = {
 	Coin: require("./coin"),
 	login: require("./login"),
 	User: require("./user"),
-	Technology: require("./technology")
+	Technology: require("./technology"),
+	SourceCode: require("source-code")
 };

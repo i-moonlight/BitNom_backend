@@ -21,7 +21,7 @@ module.exports = ({ email, password }) => {
         return jsonwebtoken.sign(
           {
             _id: user._id,
-            access: user.level
+            access: user.access
           },
           config.secret,
           { expiresIn: "1y" }
