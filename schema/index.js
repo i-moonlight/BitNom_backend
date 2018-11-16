@@ -10,7 +10,14 @@ const {
 } = require("graphql");
 
 require("../models")();
-const { Coin, User, login, AccessGroup, Technology } = require("../api");
+const {
+	Coin,
+	User,
+	login,
+	AccessGroup,
+	Technology,
+	SourceCode
+} = require("../api");
 
 const {
 	coinQuery,
@@ -21,6 +28,7 @@ const {
 const { userQuery, userMutation } = require("./user");
 const { technologyQuery, technologyMutation } = require("./technology");
 const { accessGroupQuery, accessGroupMutation } = require("./access-group");
+const { sourceCodeQuery, sourceCodeMutation } = require("./source-code");
 
 module.exports = new GraphQLSchema({
 	query: new GraphQLObjectType({
@@ -41,6 +49,10 @@ module.exports = new GraphQLSchema({
 			technology: {
 				type: technologyQuery,
 				resolve: () => Technology
+			},
+			sourceCode: {
+				type: sourceCodeQuery,
+				resolve: () => SourceCode
 			},
 			login: {
 				type: GraphQLString,
@@ -78,6 +90,10 @@ module.exports = new GraphQLSchema({
 			coin: {
 				type: coinMutation,
 				resolve: () => Coin
+			},
+			sourceCode: {
+				type: sourceCodeMutation,
+				resolve: () => SourceCode
 			}
 		}
 	}),

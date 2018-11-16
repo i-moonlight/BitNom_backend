@@ -14,9 +14,11 @@ module.exports = {
 			})
 		);
 	},
-	get({ _id, name, pagination }) {
+	get({ _id, target, user, pagination }) {
 		let params = {};
 		if (_id) params._id = _id;
+		if (target) params.target = target;
+		if (user) params.user = user;
 		return auth.loginRequired(req).then(() =>
 			mongoose
 				.model("SourceCode")
@@ -34,7 +36,7 @@ module.exports = {
 				.skip(pagination.skip)
 		);
 	},
-	delete({ ids, pagination }) {
+	delete({ ids }) {
 		return auth.loginRequired(req).then(() =>
 			mongoose
 				.model("SourceCode")
