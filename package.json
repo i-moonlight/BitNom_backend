@@ -21,6 +21,7 @@
     "bcrypt": "^3.0.2",
     "express": "^4.16.4",
     "express-graphql": "^0.7.1",
+    "express-jwt": "^5.3.1",
     "graphql": "^14.0.2",
     "jsonwebtoken": "^8.3.0",
     "mongoose": "^5.3.8",

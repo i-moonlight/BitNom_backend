@@ -1,7 +1,6 @@
 "use strict";
 
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
 const jsonwebtoken = require("jsonwebtoken");
 
 const config = require("../config");
