@@ -3,24 +3,30 @@
 const mongoose = require("mongoose");
 const randomstring = require("randomstring");
 
+const auth = require("../common/auth");
+
 module.exports = {
-	get({ _id, email, access, pagination }) {
+	get({ _id, email, access, pagination }, req) {
 		let params = {};
 		if (_id) params._id = _id;
 		if (email) params.email = email;
 		if (access) params.access = access;
-		return mongoose
-			.model("User")
-			.find(params)
-			.limit(pagination.limit)
-			.skip(pagination.skip);
+		return auth.loginRequired(req).then(() => {
+			return mongoose
+				.model("User")
+				.find(params)
+				.limit(pagination.limit)
+				.skip(pagination.skip);
+		});
 	},
 	search({ searchString, pagination }) {
-		return mongoose
-			.model("User")
-			.find({ $text: { $search: searchString } })
-			.limit(pagination.limit)
-			.skip(pagination.skip);
+		auth.loginRequired(req).then(() =>
+			mongoose
+				.model("User")
+				.find({ $text: { $search: searchString } })
+				.limit(pagination.limit)
+				.skip(pagination.skip)
+		);
 	},
 	create({ email, password }) {
 		const user = {
@@ -33,13 +39,16 @@ module.exports = {
 		return mongoose.model("User").create(user);
 	},
 	delete({ ids }) {
-		return mongoose
-			.model("User")
-			.deleteMany({ _id: { $in: ids } })
-			.then(() => ids);
+		auth.loginRequired(req).then(() =>
+			mongoose
+				.model("User")
+				.deleteMany({ _id: { $in: ids } })
+				.then(() => ids)
+		);
 	},
 	changePassword({ oldPassword, newPassword, confirmPassword }, req) {
-		return Promise.resolve()
+		return auth
+			.loginRequired(req)
 			.then(() => req.user.isPassword(oldPassword))
 			.then(matches => {
 				if (!matches)
@@ -68,18 +77,20 @@ module.exports = {
 			});
 	},
 	updateAccessGroup({ _id, accessGroup }, req) {
-		return Promise.resolve().then(() => {
-			return mongoose
-				.model("User")
-				.findOneAndUpdate(
-					{ _id },
-					{ access: accessGroup },
-					{ new: true }
-				);
-		});
+		return auth
+			.loginRequired(req)
+			.then(() =>
+				mongoose
+					.model("User")
+					.findOneAndUpdate(
+						{ _id },
+						{ access: accessGroup },
+						{ new: true }
+					)
+			);
 	},
 	updateDisplayName({ displayName }, req) {
-		return Promise.resolve().then(() => {
+		return auth.loginRequired(req).then(() => {
 			req.user.displayName = displayName;
 			return req.user.save();
 		});

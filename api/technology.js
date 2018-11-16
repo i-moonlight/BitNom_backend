@@ -24,7 +24,9 @@ module.exports = {
 		technology.follows = 0;
 		technology.date = new Date();
 		technology.user = "5bab3fba9927f84421ee9103";
-		return mongoose.model("Technology").create(technology);
+		return auth
+			.loginRequired(req)
+			.then(() => mongoose.model("Technology").create(technology));
 	},
 	vote({ candidate, invoiceId, user, amount }) {
 		return mongoose
@@ -32,13 +34,15 @@ module.exports = {
 			.create({ candidate, invoiceId, user, amount, date: new Date() });
 	},
 	delete({ ids }) {
-		return mongoose
-			.model("Technology")
-			.deleteMany({ _id: { $in: ids } })
-			.then(() => ids);
+		return auth.loginRequired(req).then(() =>
+			mongoose
+				.model("Technology")
+				.deleteMany({ _id: { $in: ids } })
+				.then(() => ids)
+		);
 	},
 	update({ _id, technology }, req) {
-		return Promise.resolve().then(() => {
+		return auth.loginRequired(req).then(() => {
 			return mongoose
 				.model("Technology")
 				.findByIdAndUpdate(_id, technology, { new: true });
