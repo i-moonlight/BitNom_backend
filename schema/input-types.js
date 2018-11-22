@@ -31,28 +31,18 @@ const permissionsInput = new GraphQLInputObjectType({
 	description: `An entry defining a group's permissions on a given
 					collection.`,
 	fields: () => ({
-		name: {
+		model: {
 			type: GraphQLNonNull(GraphQLString),
-			description: `The name of a given collection.`
+			description: `The name of a given collection e.g. user, technology etc.`
 		},
-		create: {
-			type: GraphQLBoolean,
-			description: `The group's create permissions on the collection.`,
-			defaultValue: false
+		endpoint: {
+			type: GraphQLNonNull(GraphQLString),
+			description: `The name of a given schema function e.g create, technology etc.`
 		},
-		read: {
+		owned: {
 			type: GraphQLBoolean,
-			description: `The group's read permissions on the collection.`,
-			defaultValue: false
-		},
-		update: {
-			type: GraphQLBoolean,
-			description: `The group's update permissions on the collection.`,
-			defaultValue: false
-		},
-		delete: {
-			type: GraphQLBoolean,
-			description: `The group's delete permissions on the collection.`,
+			description: `A boolean determining if the owned constraint is to be applied on
+				a given request.`,
 			defaultValue: false
 		}
 	})

@@ -33,25 +33,18 @@ const accessGroupType = new GraphQLObjectType({
 							type: GraphQLNonNull(GraphQLString),
 							description: `An auto-assigned database ID.`
 						},
-						name: {
+						model: {
 							type: GraphQLString,
-							description: `The name of a given collection.`
+							description: `The name of a specific schema model.`
 						},
-						create: {
-							type: GraphQLBoolean,
-							description: `The group's create permissions on the collection.`
+						endpoint: {
+							type: GraphQLString,
+							description: `The name of a specific schema function.`
 						},
-						read: {
+						owned: {
 							type: GraphQLBoolean,
-							description: `The group's read permissions on the collection.`
-						},
-						update: {
-							type: GraphQLBoolean,
-							description: `The group's update permissions on the collection.`
-						},
-						delete: {
-							type: GraphQLBoolean,
-							description: `The group's delete permissions on the collection.`
+							description: `
+								A boolean that determines if the owned constraint applies.`
 						}
 					})
 				})
