@@ -1,16 +1,17 @@
 "use strict";
 
 const mongoose = require("mongoose");
+const auth = require("../common/auth");
 
 module.exports = {
-	create({ name, permissions }) {
+	create({ name, permissions }, req) {
 		return auth
 			.loginRequired(req)
 			.then(() =>
 				mongoose.model("AccessGroup").create({ name, permissions })
 			);
 	},
-	get({ _id, name, pagination }) {
+	get({ _id, name, pagination }, req) {
 		let params = {};
 		if (_id) params._id = _id;
 		if (name) params.name = name;
@@ -22,7 +23,7 @@ module.exports = {
 				.skip(pagination.skip)
 		);
 	},
-	search({ searchString, pagination }) {
+	search({ searchString, pagination }, req) {
 		return auth.loginRequired(req).then(() =>
 			mongoose
 				.model("AccessGroup")
@@ -31,7 +32,7 @@ module.exports = {
 				.skip(pagination.skip)
 		);
 	},
-	delete({ ids, pagination }) {
+	delete({ ids, pagination }, req) {
 		return auth.loginRequired(req).then(() =>
 			mongoose
 				.model("AccessGroup")
@@ -39,7 +40,7 @@ module.exports = {
 				.then(() => ids)
 		);
 	},
-	deletePermission({ _id, permissionId }) {
+	deletePermission({ _id, permissionId }, req) {
 		return auth.loginRequired(req).then(() =>
 			mongoose
 				.model("AccessGroup")
@@ -54,7 +55,7 @@ module.exports = {
 				})
 		);
 	},
-	update({ _id, name, permission }) {
+	update({ _id, name, permission }, req) {
 		let updates = { name };
 		["create", "read", "update", "delete"].forEach(operation => {
 			updates["permissions.$." + operation] = permission[operation];

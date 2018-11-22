@@ -8,16 +8,21 @@ const schema = mongoose.Schema({
 	name: { type: String, required: true },
 	permissions: [
 		{
-			name: { type: String, required: true },
-			create: { type: Boolean, default: false, required: true },
-			read: { type: Boolean, default: false, required: true },
-			update: { type: Boolean, default: false, required: true },
-			delete: { type: Boolean, default: false, required: true }
+			model: { type: String, required: true },
+			endpoint: { type: String, required: true },
+			owned: { type: Boolean, required: true, default: false }
 		}
 	]
 });
 
 schema.index({ name: 1 }, { unique: true });
-schema.index({ name: 1, "permissions.name": 1 }, { unique: true });
+schema.index(
+	{
+		name: 1,
+		"permissions.model": 1,
+		"permissions.endpoint": 1
+	},
+	{ unique: true }
+);
 
 mongoose.model("AccessGroup", schema);

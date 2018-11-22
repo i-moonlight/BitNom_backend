@@ -1,10 +1,8 @@
 mutation createGroup(
 	$name: String = "maintainer",
   $permissions: [PermissionsInput]! = [
-    { name: "User", create: true, read: true, update: true, delete: true },
-    {
-      name: "AccessGroup", create: false, read: true, update: false, delete: false
-    }
+    { model: "User", endpoint: "create", owned: false },
+    { model: "User", endpoint: "create", owned: false },
   ]
 ) {
 	accessGroup {
