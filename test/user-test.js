@@ -51,6 +51,8 @@ describe("user", () => {
 					.catch(helpers.logError(done));
 			});
 
+			it("should ensure user has user-get permission");
+
 			it("should get user by email", done => {
 				let _id;
 				const user = {
@@ -93,17 +95,54 @@ describe("user", () => {
 					})
 					.catch(helpers.logError(done));
 			});
+
+			it("should get user by _id");
 		});
 
-		describe("search", () => {});
+		describe("search", () => {
+			it("should require user to be logged in");
+			it("should ensure user has user-search permission");
+			it("should get matching entries only");
+		});
 	});
 
 	describe("mutation", () => {
-		describe("create", () => {});
-		describe("changePassword", () => {});
-		describe("updateDisplayName", () => {});
-		describe("updateAccessGroup", () => {});
-		describe("resetPassword", () => {});
-		describe("delete", () => {});
+		describe("create", () => {
+			it("should validate user input");
+			it("should create a new user");
+		});
+
+		describe("changePassword", () => {
+			it("should require user to be logged in");
+			it("should validate password");
+			it("should ensure both submitted passwords match");
+			it("should change the user's password");
+		});
+
+		describe("updateDisplayName", () => {
+			it("should require user to be logged in");
+			it("should validate user input");
+			it("should update the user's display name");
+		});
+
+		describe("updateAccessGroup", () => {
+			it("should require user to be logged in");
+			it("should ensure user has user-updateAccessGroup permission");
+			it("should reject invalid user _id");
+			it("should reject request to modify admin");
+			it("should update access group");
+		});
+
+		describe("resetPassword", () => {
+			it("should reject invalid user email");
+			it("should reset user's password");
+		});
+
+		describe("delete", () => {
+			it("should require user to be logged in");
+			it("should ensure user has user-delete permission");
+			it("should reject request to delete admin");
+			it("should delete specified users");
+		});
 	});
 });
