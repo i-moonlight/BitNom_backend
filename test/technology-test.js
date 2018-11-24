@@ -105,6 +105,26 @@ describe("technology", () => {
 					.catch(helpers.logError(done));
 			});
 
+			it("should retrieve using provided name", done => {
+				helpers
+					.runQuery({ query, variables: { name: "CoinTech" } })
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data.technology).not.to.be
+							.undefined;
+						expect(response.body.data.technology.get).not.to.be
+							.null;
+						expect(
+							response.body.data.technology.get.length
+						).to.equal(1);
+						expect(
+							response.body.data.technology.get[0].name
+						).to.equal(String("CoinTech"));
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should return all if _id is not provided");
 		});
 
