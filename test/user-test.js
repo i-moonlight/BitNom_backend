@@ -702,7 +702,7 @@ describe("user", () => {
 			}`;
 
 			it("should require user to be logged in", done => {
-				const variables = { displayName: "Display Name" };
+				const variables = { displayName: "DisplayName" };
 				helpers
 					.runQuery({ query, variables }, null, done)
 					.then(response => {
@@ -718,7 +718,48 @@ describe("user", () => {
 			});
 
 			it("should validate user input");
-			it("should update the user's display name");
+
+			it("should update the user's display name", done => {
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				const variables = {
+					displayName: "DisplayName"
+				};
+				mongoose
+					.model("User")
+					.create(user)
+					.then(user => {
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data).not.to.be.undefined;
+						expect(response.body.data.user.updateDisplayName).not.to
+							.be.null;
+						expect(
+							response.body.data.user.updateDisplayName
+								.displayName
+						).to.equal(variables.displayName);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
 		});
 
 		describe("updateAccessGroup", () => {

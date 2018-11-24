@@ -104,9 +104,12 @@ module.exports = {
 			);
 	},
 	updateDisplayName({ displayName }, req) {
-		return auth.loginRequired(req).then(() => {
-			req.user.displayName = displayName;
-			return req.user.save();
-		});
+		return auth
+			.loginRequired(req)
+			.then(() => mongoose.model("User").findById(req.user._id))
+			.then(user => {
+				user.displayName = displayName;
+				return user.save();
+			});
 	}
 };
