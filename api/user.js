@@ -54,12 +54,30 @@ module.exports = {
 		return auth
 			.loginRequired(req)
 			.then(() => auth.hasPermission(req, "user", "delete"))
-			.then(() =>
-				mongoose
+			.then(() => {
+				return mongoose
 					.model("User")
-					.deleteMany({ _id: { $in: ids } })
-					.then(() => ids)
-			);
+					.find({ _id: { $in: ids } }, { _id: 0, access: 1 })
+					.then(users => {
+						return users.map(user => user.access);
+					})
+					.then(accessGroups => {
+						console.log(accessGroups);
+						return mongoose.model("AccessGroup").find({
+							_id: { $in: accessGroups },
+							name: "admin"
+						});
+					})
+					.then(adminAccessGroup => {
+						if (adminAccessGroup) {
+							throw new Error("Cannot delete an admin user!");
+						}
+						return mongoose
+							.model("User")
+							.deleteMany({ _id: { $in: ids } });
+					})
+					.then(() => "ok");
+			});
 	},
 	changePassword({ oldPassword, newPassword, confirmPassword }, req) {
 		let user;
