@@ -93,6 +93,7 @@ module.exports = {
 	updateAccessGroup({ _id, accessGroup }, req) {
 		return auth
 			.loginRequired(req)
+			.then(() => auth.hasPermission(req, "user", "updateAccessGroup"))
 			.then(() =>
 				mongoose
 					.model("User")
