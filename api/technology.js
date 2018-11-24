@@ -30,6 +30,7 @@ module.exports = {
 		technology.user = "5bab3fba9927f84421ee9103";
 		return auth
 			.loginRequired(req)
+			.then(() => auth.hasPermission(req, "technology", "create"))
 			.then(() => mongoose.model("Technology").create(technology));
 	},
 	vote({ candidate, invoiceId, user, amount }) {
