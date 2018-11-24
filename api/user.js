@@ -94,8 +94,8 @@ module.exports = {
 		return auth
 			.loginRequired(req)
 			.then(() => auth.hasPermission(req, "user", "updateAccessGroup"))
-			.then(() =>
-				mongoose
+			.then(() => {
+				return mongoose
 					.model("AccessGroup")
 					.findById(accessGroup)
 					.then(group => {
@@ -103,24 +103,34 @@ module.exports = {
 							throw new Error(
 								"Specified access group does not exist!"
 							);
+						} else if (group.name === "admin") {
+							throw new Error(
+								"Cannot set user access group to admin!"
+							);
 						}
 					})
-					.then(() => {
-						return mongoose
-							.model("User")
-							.findOneAndUpdate(
-								{ _id },
-								{ access: accessGroup },
-								{ new: true }
-							);
-					})
+					.then(() => mongoose.model("User").findById(_id))
 					.then(user => {
 						if (!user) {
 							throw new Error("Target resource does not exist!");
 						}
 						return user;
 					})
-			);
+					.then(user => {
+						return mongoose
+							.model("AccessGroup")
+							.findById(user.access)
+							.then(group => {
+								if (group.name === "admin") {
+									throw new Error(
+										"Cannot modify admin's access group!"
+									);
+								}
+								user.access = accessGroup;
+								return user.save();
+							});
+					});
+			});
 	},
 	updateDisplayName({ displayName }, req) {
 		return auth
