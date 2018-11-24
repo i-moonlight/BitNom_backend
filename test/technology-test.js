@@ -58,7 +58,7 @@ describe("technology", () => {
 					},
 					{
 						logo: "logo.png",
-						name: "CoinTech1",
+						name: "CoinTech-1",
 						focus: "finance",
 						description: "a coin for finance",
 						user: mongoose.Types.ObjectId(),
@@ -67,7 +67,7 @@ describe("technology", () => {
 					},
 					{
 						logo: "logo.png",
-						name: "CoinTech2",
+						name: "CoinTech-2",
 						focus: "finance",
 						description: "a coin for finance",
 						user: mongoose.Types.ObjectId(),
@@ -125,7 +125,7 @@ describe("technology", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should return all if _id is not provided", done => {
+			it("should return all if _id and/or name is not provided", done => {
 				helpers
 					.runQuery({ query })
 					.then(response => {
@@ -144,7 +144,94 @@ describe("technology", () => {
 		});
 
 		describe("search", () => {
-			it("should return matching entries");
+			const query = `
+			query getTechnologies(
+				$_id: String = "",
+				$searchString: String = "",
+			  	$pagination: PaginationInput = {}
+			) {
+			  	technology {
+			    	search(
+			    		_id: $_id,
+			    		searchString: $searchString,
+			    		pagination: $pagination
+			    	) {
+			      		_id
+			      		logo
+			    		name
+			    		focus
+			    		description
+			    		tags
+			    		features
+			    		innovations
+			    		repository
+			    		website
+			      		user
+			      		follows
+			      		date
+			    	}
+			  	}
+			}`;
+
+			let userId = mongoose.Types.ObjectId();
+
+			beforeEach(done => {
+				const technologies = [
+					{
+						logo: "logo.png",
+						name: "CoinTech",
+						focus: "finance",
+						description: "a coin for finance",
+						user: mongoose.Types.ObjectId(),
+						repository: "http://link.com",
+						date: new Date()
+					},
+					{
+						logo: "logo.png",
+						name: "CoinTech-1",
+						focus: "finance",
+						description: "a coin for finance",
+						user: userId,
+						repository: "http://link.com",
+						date: new Date()
+					},
+					{
+						logo: "logo.png",
+						name: "DiffTech",
+						focus: "diversity",
+						description: "a platform for the divergent",
+						user: userId,
+						repository: "http://link.com",
+						date: new Date()
+					}
+				];
+
+				mongoose
+					.model("Technology")
+					.insertMany(technologies)
+					.then(() => done())
+					.catch(helpers.logError(done));
+			});
+
+			it("should return matching entries", done => {
+				const variables = { searchString: "CoinTech" };
+				helpers
+					.runQuery({ query, variables })
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data.technology).not.to.be
+							.undefined;
+						expect(response.body.data.technology.get).not.to.be
+							.null;
+						expect(
+							response.body.data.technology.search.length
+						).to.equal(2);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
+			it("should filter results using _id if provided");
 		});
 	});
 
