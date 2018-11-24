@@ -690,7 +690,33 @@ describe("user", () => {
 		});
 
 		describe("updateDisplayName", () => {
-			it("should require user to be logged in");
+			const query = `
+			mutation updateUserDisplayName(
+				$displayName:String = ""
+			) {
+				user {
+					updateDisplayName(displayName: $displayName) {
+			    		_id displayName email avatar access
+			    	}
+				}
+			}`;
+
+			it("should require user to be logged in", done => {
+				const variables = { displayName: "Display Name" };
+				helpers
+					.runQuery({ query, variables }, null, done)
+					.then(response => {
+						expect(response).to.not.be.undefined;
+						expect(response.body).to.not.be.undefined;
+						expect(response.body.errors).to.not.be.undefined;
+						expect(response.body.errors.length).to.not.equal(0);
+						const qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal("Login required!");
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should validate user input");
 			it("should update the user's display name");
 		});
