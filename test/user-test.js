@@ -99,7 +99,6 @@ xdescribe("user", () => {
 			});
 
 			it("should get user by email", done => {
-				let _id;
 				const accessGroup = {
 					name: "canGetUser",
 					permissions: [
@@ -125,7 +124,6 @@ xdescribe("user", () => {
 							.create(Object.assign(user, { access: _id }));
 					})
 					.then(user => {
-						_id = user._id;
 						return helpers.login(
 							"example@email.com",
 							"password",
