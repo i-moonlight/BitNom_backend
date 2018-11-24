@@ -25,17 +25,20 @@ module.exports = {
 	search({ access, searchString, pagination }, req) {
 		let params = {};
 		if (access) params.access = access;
-		return auth.loginRequired(req).then(() => {
-			return mongoose
-				.model("User")
-				.find(
-					Object.assign(params, {
-						$text: { $search: searchString }
-					})
-				)
-				.limit(pagination.limit)
-				.skip(pagination.skip);
-		});
+		return auth
+			.loginRequired(req)
+			.then(() => auth.hasPermission(req, "user", "search"))
+			.then(() => {
+				return mongoose
+					.model("User")
+					.find(
+						Object.assign(params, {
+							$text: { $search: searchString }
+						})
+					)
+					.limit(pagination.limit)
+					.skip(pagination.skip);
+			});
 	},
 	create({ email, password }) {
 		const user = {
