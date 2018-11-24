@@ -11,13 +11,16 @@ module.exports = {
 		if (_id) params._id = _id;
 		if (email) params.email = email;
 		if (access) params.access = access;
-		return auth.loginRequired(req).then(() => {
-			return mongoose
-				.model("User")
-				.find(params)
-				.limit(pagination.limit)
-				.skip(pagination.skip);
-		});
+		return auth
+			.loginRequired(req)
+			.then(() => auth.hasPermission(req, "user", "get"))
+			.then(() => {
+				return mongoose
+					.model("User")
+					.find(params)
+					.limit(pagination.limit)
+					.skip(pagination.skip);
+			});
 	},
 	search({ searchString, pagination }) {
 		auth.loginRequired(req).then(() =>

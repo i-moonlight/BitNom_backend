@@ -51,9 +51,7 @@ describe("user", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should ensure user has user-get permission");
-
-			it("should get user by email", done => {
+			it("should ensure user has user-get permission", done => {
 				let _id;
 				const user = {
 					email: "example@email.com",
@@ -86,8 +84,65 @@ describe("user", () => {
 					})
 					.then(response => {
 						expect(response).not.to.be.undefined;
+						expect(response.body.errors).not.to.be.undefined;
+						expect(response.body.errors.length).not.to.equal(0);
+						let qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal("Permission denied!");
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
+			it("should get user by email", done => {
+				let _id;
+				const accessGroup = {
+					name: "canGetUser",
+					permissions: [
+						{
+							model: "user",
+							endpoint: "get"
+						}
+					]
+				};
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				mongoose
+					.model("AccessGroup")
+					.create(accessGroup)
+					.then(({ _id }) => {
+						return mongoose
+							.model("User")
+							.create(Object.assign(user, { access: _id }));
+					})
+					.then(user => {
+						_id = user._id;
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						const variables = {
+							email: "example@email.com",
+							pagination: {}
+						};
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
 						expect(response.body.data).not.to.be.undefined;
 						expect(response.body.data.user).not.to.be.undefined;
+						expect(response.body.data.user.get).not.to.be.null;
 						expect(response.body.data.user.get.length).not.to.equal(
 							0
 						);

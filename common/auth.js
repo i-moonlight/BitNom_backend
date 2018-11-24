@@ -8,7 +8,7 @@ module.exports = {
 		return Promise.resolve();
 	},
 	hasPermission(req, model, endpoint) {
-		mongoose
+		return mongoose
 			.model("AccessGroup")
 			.find({
 				_id: req.user.access,
