@@ -2,6 +2,8 @@
 
 const mongoose = require("mongoose");
 
+const auth = require("../common/auth");
+
 module.exports = {
 	get({ _id, name, pagination }) {
 		let params = {};
@@ -22,7 +24,7 @@ module.exports = {
 			.limit(pagination.limit)
 			.skip(pagination.skip);
 	},
-	create({ technology }) {
+	create({ technology }, req) {
 		technology.follows = 0;
 		technology.date = new Date();
 		technology.user = "5bab3fba9927f84421ee9103";
@@ -35,7 +37,7 @@ module.exports = {
 			.model("Vote")
 			.create({ candidate, invoiceId, user, amount, date: new Date() });
 	},
-	delete({ ids }) {
+	delete({ ids }, req) {
 		return auth.loginRequired(req).then(() =>
 			mongoose
 				.model("Technology")

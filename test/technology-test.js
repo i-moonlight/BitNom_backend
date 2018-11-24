@@ -266,7 +266,55 @@ describe("technology", () => {
 		});
 
 		describe("create", () => {
-			it("should require user to be logged in");
+			const query = `
+			mutation createTechnology($technology: TechnologyInput!) {
+			  	technology {
+				    create(technology: $technology) {
+			      		_id
+			      		logo
+			    		name
+			    		focus
+			    		description
+			    		tags
+			    		features
+			    		innovations
+			    		repository
+			    		website
+			      		user
+			      		follows
+			      		date
+			    	}
+			  	}
+			}`;
+
+			const technology = {
+				name: "IsACoin",
+				focus: "Underground Banking Finance",
+				description:
+					"A blockchain network for underground banking finance.",
+				tags: ["finance", "blockchain", "banking", "underground"],
+				features: ["high security", "proof of work"],
+				innovations: ["peer to peer transfers"],
+				repository: "https://github.com/isacoin",
+				website: "https://www.isacoin.org"
+			};
+
+			it("should require user to be logged in", done => {
+				const variables = { technology };
+				helpers
+					.runQuery({ query, variables }, null, done)
+					.then(response => {
+						expect(response).to.not.be.undefined;
+						expect(response.body).to.not.be.undefined;
+						expect(response.body.errors).to.not.be.undefined;
+						expect(response.body.errors.length).to.not.equal(0);
+						const qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal("Login required!");
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should ensure user has technology-create permission");
 			it("should validate user input");
 			it("should create a new technology entry");
