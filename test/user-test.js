@@ -1238,7 +1238,31 @@ describe("user", () => {
 		});
 
 		describe("delete", () => {
-			it("should require user to be logged in");
+			const query = `
+			mutation deleteUser(
+				$ids: [String] = ["5be3e6a04c04fa54dded0224"]
+			) {
+			  	user {
+			    	delete(ids: $ids)
+			  	}
+			}`;
+
+			it("should require user to be logged in", done => {
+				const variables = { ids: [] };
+				helpers
+					.runQuery({ query, variables }, null, done)
+					.then(response => {
+						expect(response).to.not.be.undefined;
+						expect(response.body).to.not.be.undefined;
+						expect(response.body.errors).to.not.be.undefined;
+						expect(response.body.errors.length).to.not.equal(0);
+						const qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal("Login required!");
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should ensure user has user-delete permission");
 			it("should reject request to delete admin");
 			it("should delete specified users");
