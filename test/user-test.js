@@ -522,7 +522,41 @@ describe("user", () => {
 		});
 
 		describe("changePassword", () => {
-			it("should require user to be logged in");
+			const query = `
+			mutation changePassword(
+				$oldPassword: String = "",
+				$newPassword: String = "",
+				$confirmPassword: String = ""
+			) {
+				user {
+					changePassword(
+						oldPassword: $oldPassword,
+						newPassword: $newPassword,
+						confirmPassword: $confirmPassword
+					)
+				}
+			}`;
+
+			it("should require user to be logged in", done => {
+				const variables = {
+					oldPassword: "password",
+					newPassword: "new-password",
+					confirmPassword: "new-password"
+				};
+				helpers
+					.runQuery({ query, variables }, null, done)
+					.then(response => {
+						expect(response).to.not.be.undefined;
+						expect(response.body).to.not.be.undefined;
+						expect(response.body.errors).to.not.be.undefined;
+						expect(response.body.errors.length).to.not.equal(0);
+						const qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal("Login required!");
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should validate password");
 			it("should ensure both submitted passwords match");
 			it("should change the user's password");
