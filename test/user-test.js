@@ -59,7 +59,6 @@ describe("user", () => {
 			});
 
 			it("should ensure user has user-get permission", done => {
-				let _id;
 				const user = {
 					email: "example@email.com",
 					access: mongoose.Types.ObjectId(),
@@ -71,7 +70,6 @@ describe("user", () => {
 					.model("User")
 					.create(user)
 					.then(user => {
-						_id = user._id;
 						return helpers.login(
 							"example@email.com",
 							"password",
@@ -274,9 +272,48 @@ describe("user", () => {
 		});
 
 		describe("search", () => {
-			it("should require user to be logged in");
+			const query = `
+			query searchUser(
+				$searchString: String = "",
+				$access: String = "",
+				$pagination: PaginationInput = {
+					limit: 20,
+					skip: 0
+				}
+			) {
+				user {
+					search(
+						searchString: $searchString,
+						access: $access,
+						pagination: $pagination
+					) {
+						_id displayName email avatar access
+					}
+				}
+			}`;
+
+			it("should require user to be logged in", done => {
+				const variables = {
+					searchString: "example",
+					pagination: {}
+				};
+				helpers
+					.runQuery({ query, variables }, null, done)
+					.then(response => {
+						expect(response).to.not.be.undefined;
+						expect(response.body).to.not.be.undefined;
+						expect(response.body.errors).to.not.be.undefined;
+						expect(response.body.errors.length).to.not.equal(0);
+						const qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal("Login required!");
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should ensure user has user-search permission");
 			it("should get matching entries only");
+			it("should get users with specific access group if specified");
 		});
 	});
 

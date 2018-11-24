@@ -58,7 +58,7 @@ const userQuery = new GraphQLObjectType({
 				access: {
 					type: GraphQLString,
 					description: `
-						An ID refering to an access group  which when provided,
+						An ID refering to an access group which when provided,
 						all users with the referred to access level are returned.`
 				},
 				pagination: { type: GraphQLNonNull(paginationInput) }
@@ -72,6 +72,12 @@ const userQuery = new GraphQLObjectType({
 					description: `
 						The user provided string to be used as the parameter
 						to the search function.`
+				},
+				access: {
+					type: GraphQLString,
+					description: `
+						If provided, limits result set to users of specified access
+						group returned.`
 				},
 				pagination: { type: GraphQLNonNull(paginationInput) }
 			}
