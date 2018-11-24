@@ -1415,7 +1415,79 @@ describe("user", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should delete specified users");
+			it("should delete specified users", done => {
+				const accessGroup = {
+					name: "canDeleteUser",
+					permissions: [
+						{
+							model: "user",
+							endpoint: "delete"
+						}
+					]
+				};
+				let variables = { ids: [] };
+				mongoose
+					.model("AccessGroup")
+					.create(accessGroup)
+					.then(group => {
+						const users = [
+							{
+								email: "example@email.com",
+								access: group._id,
+								date: new Date(),
+								password: "password",
+								verificationString: "verificationString"
+							},
+							{
+								email: "example1@email.com",
+								access: group._id,
+								date: new Date(),
+								password: "password",
+								verificationString: "verificationString"
+							},
+							{
+								email: "example2@email.com",
+								access: group._id,
+								date: new Date(),
+								password: "password",
+								verificationString: "verificationString"
+							}
+						];
+						return mongoose
+							.model("User")
+							.insertMany(Object.assign(users));
+					})
+					.then(users => {
+						variables.ids = [users[1]._id, users[2]._id];
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data).not.to.be.undefined;
+						expect(response.body.data.user.delete).to.equal("ok");
+					})
+					.then(() => {
+						return mongoose
+							.model("User")
+							.find({})
+							.then(users => {
+								expect(users.length).to.equal(1);
+								done();
+							});
+					})
+					.catch(helpers.logError(done));
+			});
 		});
 	});
 });
