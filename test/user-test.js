@@ -1163,7 +1163,34 @@ describe("user", () => {
 		});
 
 		describe("resetPassword", () => {
+			const query = `
+			mutation resetUserPassword (
+			 	$email: String = ""
+			) {
+			  	user {
+			    	resetPassword(email: $email)
+			  	}
+			}`;
+
 			it("should reject invalid user email");
+
+			it("should require user by email to exist", done => {
+				const variables = { email: "example@email.com" };
+				helpers
+					.runQuery({ query, variables })
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.errors).not.to.be.undefined;
+						expect(response.body.errors.length).not.to.equal(0);
+						let qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal(
+							"Target resource does not exist!"
+						);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should reset user's password");
 		});
 
