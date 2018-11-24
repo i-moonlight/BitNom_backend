@@ -102,6 +102,12 @@ module.exports = {
 						{ access: accessGroup },
 						{ new: true }
 					)
+					.then(user => {
+						if (!user) {
+							throw new Error("Target resource does not exist!");
+						}
+						return user;
+					})
 			);
 	},
 	updateDisplayName({ displayName }, req) {

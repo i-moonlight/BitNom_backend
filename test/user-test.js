@@ -834,7 +834,62 @@ describe("user", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should reject invalid user _id");
+			it("should require target user to exist", done => {
+				const accessGroup = {
+					name: "canUpdateAccessGroup",
+					permissions: [
+						{
+							model: "user",
+							endpoint: "updateAccessGroup"
+						}
+					]
+				};
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				const variables = {
+					_id: mongoose.Types.ObjectId(),
+					accessGroup: mongoose.Types.ObjectId()
+				};
+				mongoose
+					.model("AccessGroup")
+					.create(accessGroup)
+					.then(({ _id }) => {
+						return mongoose
+							.model("User")
+							.create(Object.assign(user, { access: _id }));
+					})
+					.then(user => {
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.errors).not.to.be.undefined;
+						expect(response.body.errors.length).not.to.equal(0);
+						let qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal(
+							"Target resource does not exist!"
+						);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should reject request to modify admin");
 			it("should update access group");
 		});
