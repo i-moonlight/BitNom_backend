@@ -157,7 +157,7 @@ const userMutation = new GraphQLObjectType({
 			}
 		},
 		delete: {
-			type: GraphQLList(GraphQLString),
+			type: GraphQLString,
 			description: "Delete a users by specifying their IDs.",
 			args: {
 				ids: {
