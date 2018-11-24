@@ -231,7 +231,26 @@ describe("technology", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should filter results using _id if provided");
+			it("should filter results using _id if provided", done => {
+				const variables = {
+					searchString: "CoinTech",
+					_id: userId
+				};
+				helpers
+					.runQuery({ query, variables })
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data.technology).not.to.be
+							.undefined;
+						expect(response.body.data.technology.get).not.to.be
+							.null;
+						expect(
+							response.body.data.technology.search.length
+						).to.equal(1);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
 		});
 	});
 

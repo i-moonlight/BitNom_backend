@@ -13,10 +13,12 @@ module.exports = {
 			.limit(pagination.limit)
 			.skip(pagination.skip);
 	},
-	search({ searchString, pagination }) {
+	search({ _id, searchString, pagination }) {
+		let params = {};
+		if (_id) params.user = _id;
 		return mongoose
 			.model("Technology")
-			.find({ $text: { $search: searchString } })
+			.find(Object.assign(params, { $text: { $search: searchString } }))
 			.limit(pagination.limit)
 			.skip(pagination.skip);
 	},
