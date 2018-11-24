@@ -22,14 +22,20 @@ module.exports = {
 					.skip(pagination.skip);
 			});
 	},
-	search({ searchString, pagination }) {
-		auth.loginRequired(req).then(() =>
-			mongoose
+	search({ access, searchString, pagination }, req) {
+		let params = {};
+		if (access) params.access = access;
+		return auth.loginRequired(req).then(() => {
+			return mongoose
 				.model("User")
-				.find({ $text: { $search: searchString } })
+				.find(
+					Object.assign(params, {
+						$text: { $search: searchString }
+					})
+				)
 				.limit(pagination.limit)
-				.skip(pagination.skip)
-		);
+				.skip(pagination.skip);
+		});
 	},
 	create({ email, password }) {
 		const user = {
