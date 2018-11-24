@@ -851,7 +851,7 @@ describe("user", () => {
 					password: "password",
 					verificationString: "verificationString"
 				};
-				const variables = {
+				let variables = {
 					_id: mongoose.Types.ObjectId(),
 					accessGroup: mongoose.Types.ObjectId()
 				};
@@ -859,6 +859,7 @@ describe("user", () => {
 					.model("AccessGroup")
 					.create(accessGroup)
 					.then(({ _id }) => {
+						variables.accessGroup = _id;
 						return mongoose
 							.model("User")
 							.create(Object.assign(user, { access: _id }));
@@ -884,6 +885,63 @@ describe("user", () => {
 						let qlRes = response.body.errors[0];
 						expect(qlRes.message).to.equal(
 							"Target resource does not exist!"
+						);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
+			it("should require specified access group to exist", done => {
+				const accessGroup = {
+					name: "canUpdateAccessGroup",
+					permissions: [
+						{
+							model: "user",
+							endpoint: "updateAccessGroup"
+						}
+					]
+				};
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				let variables = {
+					_id: mongoose.Types.ObjectId(),
+					accessGroup: mongoose.Types.ObjectId()
+				};
+				mongoose
+					.model("AccessGroup")
+					.create(accessGroup)
+					.then(({ _id }) => {
+						return mongoose
+							.model("User")
+							.create(Object.assign(user, { access: _id }));
+					})
+					.then(user => {
+						variables._id = user._id;
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.errors).not.to.be.undefined;
+						expect(response.body.errors.length).not.to.equal(0);
+						let qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal(
+							"Specified access group does not exist!"
 						);
 						done();
 					})

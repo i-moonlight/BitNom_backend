@@ -96,12 +96,24 @@ module.exports = {
 			.then(() => auth.hasPermission(req, "user", "updateAccessGroup"))
 			.then(() =>
 				mongoose
-					.model("User")
-					.findOneAndUpdate(
-						{ _id },
-						{ access: accessGroup },
-						{ new: true }
-					)
+					.model("AccessGroup")
+					.findById(accessGroup)
+					.then(group => {
+						if (!group) {
+							throw new Error(
+								"Specified access group does not exist!"
+							);
+						}
+					})
+					.then(() => {
+						return mongoose
+							.model("User")
+							.findOneAndUpdate(
+								{ _id },
+								{ access: accessGroup },
+								{ new: true }
+							);
+					})
 					.then(user => {
 						if (!user) {
 							throw new Error("Target resource does not exist!");
