@@ -1089,7 +1089,77 @@ describe("user", () => {
 					})
 					.catch(helpers.logError(done));
 			});
-			it("should update access group");
+
+			it("should update access group", done => {
+				const accessGroups = [
+					{
+						name: "canAlsoUpdateAccessGroup",
+						permissions: [
+							{
+								model: "user",
+								endpoint: "updateAccessGroup"
+							}
+						]
+					},
+					{
+						name: "canUpdateAccessGroup",
+						permissions: [
+							{
+								model: "user",
+								endpoint: "updateAccessGroup"
+							}
+						]
+					}
+				];
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				let variables = {
+					_id: mongoose.Types.ObjectId(),
+					accessGroup: mongoose.Types.ObjectId()
+				};
+				mongoose
+					.model("AccessGroup")
+					.insertMany(accessGroups)
+					.then(groups => {
+						variables.accessGroup = groups[1]._id;
+						return mongoose
+							.model("User")
+							.create(
+								Object.assign(user, { access: groups[0]._id })
+							);
+					})
+					.then(user => {
+						variables._id = user._id;
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data).not.to.be.undefined;
+						expect(response.body.data.user.updateAccessGroup).not.to
+							.be.null;
+						expect(
+							response.body.data.user.updateAccessGroup.access
+						).to.equal(String(variables.accessGroup));
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
 		});
 
 		describe("resetPassword", () => {
