@@ -93,6 +93,10 @@ const technologyQuery = new GraphQLObjectType({
 		search: {
 			type: GraphQLList(technologyType),
 			args: {
+				_id: {
+					type: GraphQLString,
+					description: "The ID of an arbitrary user."
+				},
 				searchString: {
 					type: GraphQLString,
 					description: "The string to be used as the search key."
