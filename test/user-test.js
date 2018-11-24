@@ -1310,24 +1310,33 @@ describe("user", () => {
 						}
 					]
 				};
-				const user = {
-					email: "example@email.com",
-					access: mongoose.Types.ObjectId(),
-					date: new Date(),
-					password: "password",
-					verificationString: "verificationString"
-				};
 				let variables = { ids: [] };
 				mongoose
 					.model("AccessGroup")
 					.create(accessGroup)
 					.then(group => {
-						variables.ids = [group._id];
+						const users = [
+							{
+								email: "example@email.com",
+								access: group._id,
+								date: new Date(),
+								password: "password",
+								verificationString: "verificationString"
+							},
+							{
+								email: "example1@email.com",
+								access: group._id,
+								date: new Date(),
+								password: "password",
+								verificationString: "verificationString"
+							}
+						];
 						return mongoose
 							.model("User")
-							.create(Object.assign(user, { access: group._id }));
+							.insertMany(Object.assign(users));
 					})
-					.then(user => {
+					.then(users => {
+						variables.ids = [users[1]._id];
 						return helpers.login(
 							"example@email.com",
 							"password",
@@ -1349,6 +1358,58 @@ describe("user", () => {
 						expect(qlRes.message).to.equal(
 							"Cannot delete an admin user!"
 						);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
+			it("should reject request to delete self", done => {
+				const accessGroup = {
+					name: "canDeleteUser",
+					permissions: [
+						{
+							model: "user",
+							endpoint: "delete"
+						}
+					]
+				};
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				let variables = { ids: [] };
+				mongoose
+					.model("AccessGroup")
+					.create(accessGroup)
+					.then(group => {
+						return mongoose
+							.model("User")
+							.create(Object.assign(user, { access: group._id }));
+					})
+					.then(user => {
+						variables.ids = [user._id];
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.errors).not.to.be.undefined;
+						expect(response.body.errors.length).not.to.equal(0);
+						let qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal("Cannot delete self!");
 						done();
 					})
 					.catch(helpers.logError(done));

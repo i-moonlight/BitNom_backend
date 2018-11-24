@@ -55,6 +55,9 @@ module.exports = {
 			.loginRequired(req)
 			.then(() => auth.hasPermission(req, "user", "delete"))
 			.then(() => {
+				if (ids.indexOf(String(req.user._id)) !== -1) {
+					throw new Error("Cannot delete self!");
+				}
 				return mongoose
 					.model("User")
 					.find({ _id: { $in: ids } }, { _id: 0, access: 1 })
@@ -62,14 +65,13 @@ module.exports = {
 						return users.map(user => user.access);
 					})
 					.then(accessGroups => {
-						console.log(accessGroups);
 						return mongoose.model("AccessGroup").find({
 							_id: { $in: accessGroups },
 							name: "admin"
 						});
 					})
 					.then(adminAccessGroup => {
-						if (adminAccessGroup) {
+						if (adminAccessGroup.length !== 0) {
 							throw new Error("Cannot delete an admin user!");
 						}
 						return mongoose
