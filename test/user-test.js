@@ -1191,7 +1191,50 @@ describe("user", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should reset user's password");
+			it("should reset user's password", done => {
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				let oldHash;
+				mongoose
+					.model("User")
+					.create(user)
+					.then(user => {
+						oldHash = user.hash;
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						const variables = {
+							email: "example@email.com"
+						};
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data).not.to.be.undefined;
+						expect(response.body.data.user.resetPassword).to.equal(
+							"ok"
+						);
+					})
+					.then(() => mongoose.model("User").findOne({}))
+					.then(user => {
+						expect(user.hash).not.to.equal(oldHash);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
 		});
 
 		describe("delete", () => {
