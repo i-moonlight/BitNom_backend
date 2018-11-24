@@ -51,12 +51,15 @@ module.exports = {
 		return mongoose.model("User").create(user);
 	},
 	delete({ ids }, req) {
-		return auth.loginRequired(req).then(() =>
-			mongoose
-				.model("User")
-				.deleteMany({ _id: { $in: ids } })
-				.then(() => ids)
-		);
+		return auth
+			.loginRequired(req)
+			.then(() => auth.hasPermission(req, "user", "delete"))
+			.then(() =>
+				mongoose
+					.model("User")
+					.deleteMany({ _id: { $in: ids } })
+					.then(() => ids)
+			);
 	},
 	changePassword({ oldPassword, newPassword, confirmPassword }, req) {
 		let user;
