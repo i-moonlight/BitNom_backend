@@ -59,16 +59,20 @@ module.exports = {
 		);
 	},
 	changePassword({ oldPassword, newPassword, confirmPassword }, req) {
+		let user;
 		return auth
 			.loginRequired(req)
 			.then(() => mongoose.model("User").findById(req.user._id))
-			.then(user => user.isPassword(oldPassword))
+			.then(savedUser => {
+				user = savedUser;
+				return user.isPassword(oldPassword);
+			})
 			.then(matches => {
 				if (!matches) throw new Error("Incorrect password!");
-				if (newPassword !== oldPassword)
+				if (newPassword !== confirmPassword)
 					throw new Error("Passwords mismatch!");
-				req.user.password = newPassword;
-				return req.user.save().then(() => "ok");
+				user.password = newPassword;
+				return user.save().then(() => "ok");
 			});
 	},
 	resetPassword({ email }) {
