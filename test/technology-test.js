@@ -125,7 +125,22 @@ describe("technology", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should return all if _id is not provided");
+			it("should return all if _id is not provided", done => {
+				helpers
+					.runQuery({ query })
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data.technology).not.to.be
+							.undefined;
+						expect(response.body.data.technology.get).not.to.be
+							.null;
+						expect(
+							response.body.data.technology.get.length
+						).to.equal(3);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
 		});
 
 		describe("search", () => {
