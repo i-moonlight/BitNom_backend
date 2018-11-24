@@ -1300,7 +1300,60 @@ describe("user", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should reject request to delete admin");
+			it("should reject request to delete admin", done => {
+				const accessGroup = {
+					name: "admin",
+					permissions: [
+						{
+							model: "user",
+							endpoint: "delete"
+						}
+					]
+				};
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				let variables = { ids: [] };
+				mongoose
+					.model("AccessGroup")
+					.create(accessGroup)
+					.then(group => {
+						variables.ids = [group._id];
+						return mongoose
+							.model("User")
+							.create(Object.assign(user, { access: group._id }));
+					})
+					.then(user => {
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.errors).not.to.be.undefined;
+						expect(response.body.errors.length).not.to.equal(0);
+						let qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal(
+							"Cannot delete an admin user!"
+						);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should delete specified users");
 		});
 	});
