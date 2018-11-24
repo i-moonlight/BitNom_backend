@@ -21,13 +21,19 @@ describe("user", () => {
 			query getUser(
 				$email: String = "",
 				$_id: String = "",
+				$access: String = "",
 				$pagination: PaginationInput = {
 					limit: 20,
 					skip: 0
 				}
 			) {
 				user {
-					get(email: $email, _id: $_id, pagination: $pagination) {
+					get(
+						email: $email,
+						_id: $_id,
+						access: $access,
+						pagination: $pagination
+					) {
 						_id displayName email avatar access
 					}
 				}
@@ -206,7 +212,65 @@ describe("user", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should get users of specific access group if specified");
+			it("should get users of specific access group if specified", done => {
+				const accessGroup = {
+					name: "canGetUser",
+					permissions: [
+						{
+							model: "user",
+							endpoint: "get"
+						}
+					]
+				};
+				let users = [
+					{
+						email: "example@email.com",
+						access: mongoose.Types.ObjectId(),
+						date: new Date(),
+						password: "password",
+						verificationString: "verificationString"
+					},
+					{
+						email: "example1@email.com",
+						access: mongoose.Types.ObjectId(),
+						date: new Date(),
+						password: "password",
+						verificationString: "verificationString"
+					}
+				];
+				let access;
+				mongoose
+					.model("AccessGroup")
+					.create(accessGroup)
+					.then(({ _id }) => {
+						access = _id;
+						users[0].access = _id;
+						return mongoose.model("User").insertMany(users);
+					})
+					.then(users => {
+						return helpers.login(users[0].email, "password", done);
+					})
+					.then(token => {
+						const variables = {
+							access,
+							pagination: {}
+						};
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data).not.to.be.undefined;
+						expect(response.body.data.user).not.to.be.undefined;
+						expect(response.body.data.user.get).not.to.be.null;
+						expect(response.body.data.user.get.length).to.equal(1);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
 		});
 
 		describe("search", () => {
