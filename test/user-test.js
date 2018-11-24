@@ -351,7 +351,66 @@ describe("user", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should get matching entries only");
+			it("should get matching entries only", done => {
+				const accessGroup = {
+					name: "canSearchUser",
+					permissions: [
+						{
+							model: "user",
+							endpoint: "search"
+						}
+					]
+				};
+				let users = [
+					{
+						email: "example@email.com",
+						access: mongoose.Types.ObjectId(),
+						date: new Date(),
+						password: "password",
+						verificationString: "verificationString"
+					},
+					{
+						email: "sample@email.com",
+						access: mongoose.Types.ObjectId(),
+						date: new Date(),
+						password: "password",
+						verificationString: "verificationString"
+					}
+				];
+				mongoose
+					.model("AccessGroup")
+					.create(accessGroup)
+					.then(({ _id }) => {
+						users[0].access = _id;
+						return mongoose.model("User").insertMany(users);
+					})
+					.then(users => {
+						return helpers.login(users[0].email, "password", done);
+					})
+					.then(token => {
+						const variables = {
+							searchString: "example",
+							pagination: {}
+						};
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data).not.to.be.undefined;
+						expect(response.body.data.user).not.to.be.undefined;
+						expect(response.body.data.user.search).not.to.be.null;
+						expect(response.body.data.user.search.length).to.equal(
+							1
+						);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should get users with specific access group if specified");
 		});
 	});
