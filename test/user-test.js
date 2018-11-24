@@ -600,7 +600,46 @@ describe("user", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should ensure both submitted passwords match");
+			it("should ensure both submitted passwords match", done => {
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				mongoose
+					.model("User")
+					.create(user)
+					.then(user => {
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						const variables = {
+							oldPassword: "password",
+							newPassword: "new-password",
+							confirmPassword: "mismatch"
+						};
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.errors).not.to.be.undefined;
+						expect(response.body.errors.length).not.to.equal(0);
+						let qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal("Passwords mismatch!");
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
 
 			it("should change the user's password");
 		});
