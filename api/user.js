@@ -81,9 +81,7 @@ module.exports = {
 			.findOne({ email })
 			.then(user => {
 				if (user === null)
-					throw new Error(
-						"No user was found using the provided email."
-					);
+					throw new Error("Target resource does not exist!");
 				const password = randomstring.generate(8);
 				user.password = password;
 				console.log(`Sending ${password} via reset password email.`);
