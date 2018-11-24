@@ -11,6 +11,7 @@ describe("user", () => {
 			mongoose
 				.model("User")
 				.deleteMany({})
+				.then(() => mongoose.model("AccessGroup").deleteMany({}))
 				.then(() => done())
 				.catch(done);
 		});
@@ -143,15 +144,69 @@ describe("user", () => {
 						expect(response.body.data).not.to.be.undefined;
 						expect(response.body.data.user).not.to.be.undefined;
 						expect(response.body.data.user.get).not.to.be.null;
-						expect(response.body.data.user.get.length).not.to.equal(
-							0
-						);
+						expect(response.body.data.user.get.length).to.equal(1);
 						done();
 					})
 					.catch(helpers.logError(done));
 			});
 
-			it("should get user by _id");
+			it("should get user by _id", done => {
+				let _id;
+				const accessGroup = {
+					name: "canGetUser",
+					permissions: [
+						{
+							model: "user",
+							endpoint: "get"
+						}
+					]
+				};
+				const user = {
+					email: "example1@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				mongoose
+					.model("AccessGroup")
+					.create(accessGroup)
+					.then(({ _id }) => {
+						return mongoose
+							.model("User")
+							.create(Object.assign(user, { access: _id }));
+					})
+					.then(user => {
+						_id = user._id;
+						return helpers.login(
+							"example1@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						const variables = {
+							_id,
+							pagination: {}
+						};
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data).not.to.be.undefined;
+						expect(response.body.data.user).not.to.be.undefined;
+						expect(response.body.data.user.get).not.to.be.null;
+						expect(response.body.data.user.get.length).to.equal(1);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
+			it("should get users of specific access group if specified");
 		});
 
 		describe("search", () => {
