@@ -61,14 +61,12 @@ module.exports = {
 	changePassword({ oldPassword, newPassword, confirmPassword }, req) {
 		return auth
 			.loginRequired(req)
-			.then(() => req.user.isPassword(oldPassword))
+			.then(() => mongoose.model("User").findById(req.user._id))
+			.then(user => user.isPassword(oldPassword))
 			.then(matches => {
-				if (!matches)
-					throw new Error(
-						"Provided password does not match your old password!"
-					);
+				if (!matches) throw new Error("Incorrect password!");
 				if (newPassword !== oldPassword)
-					throw new Error("Provided passwords do not match!");
+					throw new Error("Passwords mismatch!");
 				req.user.password = newPassword;
 				return req.user.save().then(() => "ok");
 			});
