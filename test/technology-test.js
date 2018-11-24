@@ -353,7 +353,60 @@ describe("technology", () => {
 			});
 
 			it("should validate user input");
-			it("should create a new technology entry");
+
+			it("should create a new technology entry", done => {
+				const accessGroup = {
+					name: "canGetUser",
+					permissions: [
+						{
+							model: "technology",
+							endpoint: "create"
+						}
+					]
+				};
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				mongoose
+					.model("AccessGroup")
+					.create(accessGroup)
+					.then(({ _id }) => {
+						return mongoose
+							.model("User")
+							.create(Object.assign(user, { access: _id }));
+					})
+					.then(user => {
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						const variables = { technology };
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data).not.to.be.undefined;
+						expect(response.body.data.technology).not.to.be
+							.undefined;
+						expect(response.body.data.technology.create).not.to.be
+							.null;
+						expect(response.body.data.technology.create._id).to.not
+							.be.undefined;
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
 		});
 
 		describe("vote", () => {});
