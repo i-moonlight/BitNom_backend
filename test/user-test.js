@@ -477,9 +477,48 @@ describe("user", () => {
 	});
 
 	describe("mutation", () => {
+		beforeEach(done => {
+			mongoose
+				.model("User")
+				.deleteMany({})
+				.then(() => mongoose.model("AccessGroup").deleteMany({}))
+				.then(() => done())
+				.catch(done);
+		});
+
 		describe("create", () => {
+			const query = `
+			mutation createUser(
+				$email: String = "",
+				$password: String = ""
+			) {
+				user {
+					create(email: $email, password: $password) {
+						_id displayName email avatar access
+					}
+				}
+			}`;
+
 			it("should validate user input");
-			it("should create a new user");
+
+			it("should create a new user", done => {
+				const variables = {
+					email: "example@email.com",
+					password: "password"
+				};
+				helpers
+					.runQuery({ query, variables })
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data).not.to.be.undefined;
+						expect(response.body.data.user).not.to.be.undefined;
+						expect(response.body.data.user.create).not.to.be.null;
+						expect(response.body.data.user.create._id).not.to.be
+							.undefined;
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
 		});
 
 		describe("changePassword", () => {
