@@ -42,7 +42,20 @@ module.exports = {
 		return auth.loginRequired(req).then(() =>
 			mongoose
 				.model("Technology")
-				.deleteMany({ _id: { $in: ids } })
+				.find({ _id: { $in: ids } })
+				.then(technologies => {
+					let owned = technologies.reduce((acc, technology) => {
+						return acc && technology.user === req.user._id;
+					}, true);
+					if (!owned) {
+						throw new Error("Ownership required!");
+					}
+				})
+				.then(() => {
+					return mongoose
+						.model("Technology")
+						.deleteMany({ _id: { $in: ids } });
+				})
 				.then(() => ids)
 		);
 	},

@@ -437,7 +437,55 @@ describe("technology", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should ensure user owns the technology");
+			it("should ensure user owns the technology", done => {
+				const technology = {
+					logo: "logo.png",
+					name: "CoinTech",
+					focus: "finance",
+					description: "a coin for finance",
+					user: mongoose.Types.ObjectId(),
+					repository: "http://link.com",
+					date: new Date()
+				};
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				let technologyId;
+				mongoose
+					.model("User")
+					.create(user)
+					.then(() => mongoose.model("Technology").create(technology))
+					.then(({ _id }) => (technologyId = _id))
+					.then(() => {
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						const variables = { ids: [technologyId] };
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.errors).not.to.be.undefined;
+						expect(response.body.errors.length).not.to.equal(0);
+						let qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal("Ownership required!");
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should delete the specified technology entries");
 		});
 
