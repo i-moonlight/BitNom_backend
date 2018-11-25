@@ -72,7 +72,19 @@ module.exports = {
 		return auth.loginRequired(req).then(() => {
 			return mongoose
 				.model("Technology")
-				.findByIdAndUpdate(_id, technology, { new: true });
+				.findById(_id)
+				.then(savedTechnology => {
+					if (!savedTechnology) {
+						throw new Error("Target resource does not exist!");
+					}
+					if (String(savedTechnology.user) !== String(req.user._id)) {
+						throw new Error("Ownership required!");
+					}
+					Object.keys(technology).forEach(key => {
+						savedTechnology[key] = technology[key];
+					});
+					return savedTechnology.save();
+				});
 		});
 	}
 };
