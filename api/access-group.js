@@ -15,13 +15,16 @@ module.exports = {
 		let params = {};
 		if (_id) params._id = _id;
 		if (name) params.name = name;
-		return auth.loginRequired(req).then(() =>
-			mongoose
-				.model("AccessGroup")
-				.find(params)
-				.limit(pagination.limit)
-				.skip(pagination.skip)
-		);
+		return auth
+			.loginRequired(req)
+			.then(() => auth.hasPermission(req, "accessGroup", "get"))
+			.then(() =>
+				mongoose
+					.model("AccessGroup")
+					.find(params)
+					.limit(pagination.limit)
+					.skip(pagination.skip)
+			);
 	},
 	search({ searchString, pagination }, req) {
 		return auth.loginRequired(req).then(() =>
