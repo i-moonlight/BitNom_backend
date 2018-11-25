@@ -489,7 +489,60 @@ describe("technology", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should delete the specified technology entries");
+			it("should delete the specified technology entries", done => {
+				const technology = {
+					logo: "logo.png",
+					name: "CoinTech",
+					focus: "finance",
+					description: "a coin for finance",
+					user: mongoose.Types.ObjectId(),
+					repository: "http://link.com",
+					date: new Date()
+				};
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				let technologyId;
+				mongoose
+					.model("User")
+					.create(user)
+					.then(({ _id }) => {
+						return mongoose
+							.model("Technology")
+							.create(Object.assign(technology, { user: _id }));
+					})
+					.then(({ _id }) => (technologyId = _id))
+					.then(() => {
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						const variables = { ids: [technologyId] };
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data).not.to.be.undefined;
+						expect(response.body.data.technology).not.to.be
+							.undefined;
+						expect(response.body.data.technology.delete).to.equal(
+							"ok"
+						);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
 		});
 
 		describe("update", () => {

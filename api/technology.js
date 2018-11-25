@@ -45,7 +45,10 @@ module.exports = {
 				.find({ _id: { $in: ids } })
 				.then(technologies => {
 					let owned = technologies.reduce((acc, technology) => {
-						return acc && technology.user === req.user._id;
+						return (
+							acc &&
+							String(technology.user) === String(req.user._id)
+						);
 					}, true);
 					if (!owned) {
 						return auth
@@ -60,9 +63,9 @@ module.exports = {
 				.then(() => {
 					return mongoose
 						.model("Technology")
-						.deleteMany({ _id: { $in: ids } });
+						.deleteMany({ _id: { $in: ids } })
+						.then(() => "ok");
 				})
-				.then(() => ids)
 		);
 	},
 	update({ _id, technology }, req) {

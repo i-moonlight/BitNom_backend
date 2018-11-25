@@ -131,7 +131,7 @@ const technologyMutation = new GraphQLObjectType({
 			}
 		},
 		delete: {
-			type: GraphQLList(GraphQLString),
+			type: GraphQLString,
 			description:
 				"Delete a list of technologies by specifying their IDs.",
 			args: {
