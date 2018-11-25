@@ -478,7 +478,29 @@ describe("accessGroup", () => {
 		});
 
 		describe("delete", () => {
-			it("should require user to be logged in");
+			const query = `
+			mutation deleteGroup($ids:[String] = []) {
+			  	accessGroup {
+			    	delete(ids: $ids)
+			  	}
+			}`;
+
+			it("should require user to be logged in", done => {
+				const variables = { ids: [] };
+				helpers
+					.runQuery({ query, variables }, null, done)
+					.then(response => {
+						expect(response).to.not.be.undefined;
+						expect(response.body).to.not.be.undefined;
+						expect(response.body.errors).to.not.be.undefined;
+						expect(response.body.errors.length).to.not.equal(0);
+						const qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal("Login required!");
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should ensure user has accessGroup-delete permission");
 			it("should reject request to delete for admin");
 			it("should delete specified access groups");
