@@ -7,6 +7,7 @@ module.exports = {
 	create({ name, permissions }, req) {
 		return auth
 			.loginRequired(req)
+			.then(() => auth.hasPermission(req, "accessGroup", "create"))
 			.then(() =>
 				mongoose.model("AccessGroup").create({ name, permissions })
 			);
