@@ -48,7 +48,13 @@ module.exports = {
 						return acc && technology.user === req.user._id;
 					}, true);
 					if (!owned) {
-						throw new Error("Ownership required!");
+						return auth
+							.hasPermission(req, "technology", "delete")
+							.catch(error => {
+								throw new Error(
+									"Ownership or permission required!"
+								);
+							});
 					}
 				})
 				.then(() => {
