@@ -684,7 +684,66 @@ describe("technology", () => {
 			});
 
 			it("should validate user input");
-			it("should update the specified technology entry");
+
+			it("should update the specified technology entry", done => {
+				const technology = {
+					logo: "logo.png",
+					name: "CoinTech",
+					focus: "finance",
+					description: "a coin for finance",
+					user: mongoose.Types.ObjectId(),
+					repository: "http://link.com",
+					date: new Date()
+				};
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				let technologyId;
+				mongoose
+					.model("User")
+					.create(user)
+					.then(({ _id }) => {
+						return mongoose
+							.model("Technology")
+							.create(Object.assign(technology, { user: _id }));
+					})
+					.then(({ _id }) => (technologyId = _id))
+					.then(() => {
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						const variables = {
+							_id: technologyId,
+							technology: { name: "CoinTech-1" }
+						};
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data).not.to.be.undefined;
+						expect(response.body.data.technology).not.to.be
+							.undefined;
+						expect(response.body.data.technology.update).not.to.be
+							.null;
+						expect(
+							response.body.data.technology.update.name
+						).to.equal("CoinTech-1");
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
 		});
 	});
 });
