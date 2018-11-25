@@ -437,7 +437,8 @@ describe("technology", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should ensure user owns the technology", done => {
+			it(`should require ownership of the technology or technology-delete
+				permission`, done => {
 				const technology = {
 					logo: "logo.png",
 					name: "CoinTech",
@@ -480,7 +481,9 @@ describe("technology", () => {
 						expect(response.body.errors).not.to.be.undefined;
 						expect(response.body.errors.length).not.to.equal(0);
 						let qlRes = response.body.errors[0];
-						expect(qlRes.message).to.equal("Ownership required!");
+						expect(qlRes.message).to.equal(
+							"Ownership or permission required!"
+						);
 						done();
 					})
 					.catch(helpers.logError(done));
