@@ -100,15 +100,26 @@ describe("accessGroup", () => {
 			});
 
 			it("should retrieve by provided _id", done => {
-				const accessGroup = {
-					name: "canGetAccessGroup",
-					permissions: [
-						{
-							model: "accessGroup",
-							endpoint: "get"
-						}
-					]
-				};
+				const accessGroups = [
+					{
+						name: "canGetAccessGroup",
+						permissions: [
+							{
+								model: "accessGroup",
+								endpoint: "get"
+							}
+						]
+					},
+					{
+						name: "canGetUser",
+						permissions: [
+							{
+								model: "user",
+								endpoint: "get"
+							}
+						]
+					}
+				];
 				const user = {
 					email: "example@email.com",
 					access: mongoose.Types.ObjectId(),
@@ -119,12 +130,14 @@ describe("accessGroup", () => {
 				let accessGroupId;
 				mongoose
 					.model("AccessGroup")
-					.create(accessGroup)
-					.then(({ _id }) => {
-						accessGroupId = _id;
+					.insertMany(accessGroups)
+					.then(accessGroups => {
+						accessGroupId = accessGroups[0]._id;
 						return mongoose
 							.model("User")
-							.create(Object.assign(user, { access: _id }));
+							.create(
+								Object.assign(user, { access: accessGroupId })
+							);
 					})
 					.then(user => {
 						return helpers.login(
@@ -160,15 +173,26 @@ describe("accessGroup", () => {
 			});
 
 			it("should retrieve by provided name", done => {
-				const accessGroup = {
-					name: "canGetAccessGroup",
-					permissions: [
-						{
-							model: "accessGroup",
-							endpoint: "get"
-						}
-					]
-				};
+				const accessGroups = [
+					{
+						name: "canGetAccessGroup",
+						permissions: [
+							{
+								model: "accessGroup",
+								endpoint: "get"
+							}
+						]
+					},
+					{
+						name: "canGetUser",
+						permissions: [
+							{
+								model: "user",
+								endpoint: "get"
+							}
+						]
+					}
+				];
 				const user = {
 					email: "example@email.com",
 					access: mongoose.Types.ObjectId(),
@@ -178,11 +202,12 @@ describe("accessGroup", () => {
 				};
 				mongoose
 					.model("AccessGroup")
-					.create(accessGroup)
-					.then(({ _id }) => {
+					.insertMany(accessGroups)
+					.then(accessGroups => {
+						let access = accessGroups[0]._id;
 						return mongoose
 							.model("User")
-							.create(Object.assign(user, { access: _id }));
+							.create(Object.assign(user, { access }));
 					})
 					.then(user => {
 						return helpers.login(
@@ -217,7 +242,74 @@ describe("accessGroup", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should retrive all is _id and/or name is not provided");
+			it("should retrive all if _id and name are not provided", done => {
+				const accessGroups = [
+					{
+						name: "canGetAccessGroup",
+						permissions: [
+							{
+								model: "accessGroup",
+								endpoint: "get"
+							}
+						]
+					},
+					{
+						name: "canGetUser",
+						permissions: [
+							{
+								model: "user",
+								endpoint: "get"
+							}
+						]
+					}
+				];
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				mongoose
+					.model("AccessGroup")
+					.insertMany(accessGroups)
+					.then(accessGroups => {
+						let access = accessGroups[0]._id;
+						return mongoose
+							.model("User")
+							.create(Object.assign(user, { access }));
+					})
+					.then(user => {
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						const variables = {
+							pagination: {}
+						};
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data).not.to.be.undefined;
+						expect(response.body.data.accessGroup).not.to.be
+							.undefined;
+						expect(response.body.data.accessGroup.get).not.to.be
+							.null;
+						expect(
+							response.body.data.accessGroup.get.length
+						).to.equal(2);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
 		});
 	});
 
