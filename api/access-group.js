@@ -37,12 +37,15 @@ module.exports = {
 		);
 	},
 	delete({ ids, pagination }, req) {
-		return auth.loginRequired(req).then(() =>
-			mongoose
-				.model("AccessGroup")
-				.deleteMany({ _id: { $in: ids } })
-				.then(() => ids)
-		);
+		return auth
+			.loginRequired(req)
+			.then(() => auth.hasPermission(req, "accessGroup", "create"))
+			.then(() =>
+				mongoose
+					.model("AccessGroup")
+					.deleteMany({ _id: { $in: ids } })
+					.then(() => ids)
+			);
 	},
 	deletePermission({ _id, permissionId }, req) {
 		return auth.loginRequired(req).then(() =>
