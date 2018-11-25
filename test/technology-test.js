@@ -412,7 +412,31 @@ describe("technology", () => {
 		describe("vote", () => {});
 
 		describe("delete", () => {
-			it("should require user to be logged in");
+			const query = `
+			mutation deleteTechnology(
+			  	$ids: [String] = []
+			) {
+			  	technology {
+			    	delete(ids: $ids)
+			  	}
+			}`;
+
+			it("should require user to be logged in", done => {
+				const variables = { ids: [] };
+				helpers
+					.runQuery({ query, variables }, null, done)
+					.then(response => {
+						expect(response).to.not.be.undefined;
+						expect(response.body).to.not.be.undefined;
+						expect(response.body.errors).to.not.be.undefined;
+						expect(response.body.errors.length).to.not.equal(0);
+						const qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal("Login required!");
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should ensure user owns the technology");
 			it("should delete the specified technology entries");
 		});
