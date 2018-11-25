@@ -324,7 +324,47 @@ describe("accessGroup", () => {
 		});
 
 		describe("create", () => {
-			it("should require user to be logged in");
+			const query = `
+			mutation createGroup(
+				$name: String = "",
+			  	$permissions: [PermissionsInput]! = []
+			) {
+				accessGroup {
+					create(name: $name, permissions: $permissions) {
+						_id
+						name
+						permissions {
+							_id model endpoint owned
+						}
+					}
+				}
+			}`;
+
+			it("should require user to be logged in", done => {
+				const variables = {
+					name: "canGetAccessGroup",
+					permissions: [
+						{
+							model: "accessGroup",
+							endpoint: "get"
+						}
+					],
+					pagination: {}
+				};
+				helpers
+					.runQuery({ query, variables }, null, done)
+					.then(response => {
+						expect(response).to.not.be.undefined;
+						expect(response.body).to.not.be.undefined;
+						expect(response.body.errors).to.not.be.undefined;
+						expect(response.body.errors.length).to.not.equal(0);
+						const qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal("Login required!");
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should ensure user has accessGroup-create permission");
 			it("should validate user input");
 			it("should create a new access group entry");
