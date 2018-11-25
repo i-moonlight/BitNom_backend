@@ -99,8 +99,68 @@ describe("accessGroup", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should retrieve by provided _id");
-			it("should retrive all is _id is not provided");
+			it("should retrieve by provided _id", done => {
+				const accessGroup = {
+					name: "canGetAccessGroup",
+					permissions: [
+						{
+							model: "accessGroup",
+							endpoint: "get"
+						}
+					]
+				};
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				let accessGroupId;
+				mongoose
+					.model("AccessGroup")
+					.create(accessGroup)
+					.then(({ _id }) => {
+						accessGroupId = _id;
+						return mongoose
+							.model("User")
+							.create(Object.assign(user, { access: _id }));
+					})
+					.then(user => {
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						const variables = {
+							_id: accessGroupId,
+							pagination: {}
+						};
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data).not.to.be.undefined;
+						expect(response.body.data.accessGroup).not.to.be
+							.undefined;
+						expect(response.body.data.accessGroup.get).not.to.be
+							.null;
+						expect(
+							response.body.data.accessGroup.get.length
+						).to.equal(1);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
+			it("should retrieve by provided name");
+			it("should retrive all is _id and/or name is not provided");
 		});
 	});
 
