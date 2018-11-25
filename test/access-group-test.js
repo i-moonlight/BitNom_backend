@@ -538,7 +538,77 @@ describe("accessGroup", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should reject request to delete for admin");
+			it("should reject request to delete admin access group", done => {
+				const accessGroups = [
+					{
+						name: "admin",
+						permissions: [
+							{
+								model: "accessGroup",
+								endpoint: "get"
+							}
+						]
+					},
+					{
+						name: "canDeleteAccessGroup",
+						permissions: [
+							{
+								model: "accessGroup",
+								endpoint: "delete"
+							}
+						]
+					}
+				];
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				let accessGroupId;
+				mongoose
+					.model("AccessGroup")
+					.insertMany(accessGroups)
+					.then(accessGroups => {
+						accessGroupId = accessGroups[0]._id;
+						return mongoose.model("User").create(
+							Object.assign(user, {
+								access: accessGroups[1]._id
+							})
+						);
+					})
+					.then(user => {
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						const variables = {
+							ids: [accessGroupId],
+							pagination: {}
+						};
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.errors).not.to.be.undefined;
+						expect(response.body.errors.length).not.to.equal(0);
+						let qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal(
+							"Cannot delete admin access group!"
+						);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should delete specified access groups");
 		});
 

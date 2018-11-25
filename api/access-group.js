@@ -36,16 +36,32 @@ module.exports = {
 				.skip(pagination.skip)
 		);
 	},
-	delete({ ids, pagination }, req) {
+	delete({ ids }, req) {
 		return auth
 			.loginRequired(req)
-			.then(() => auth.hasPermission(req, "accessGroup", "create"))
-			.then(() =>
-				mongoose
+			.then(() => auth.hasPermission(req, "accessGroup", "delete"))
+			.then(() => {
+				if (ids.indexOf(String(req.user._id)) !== -1) {
+					throw new Error("Cannot delete own access group!");
+				}
+				return mongoose
 					.model("AccessGroup")
-					.deleteMany({ _id: { $in: ids } })
-					.then(() => ids)
-			);
+					.find({
+						_id: { $in: ids },
+						name: "admin"
+					})
+					.then(adminAccessGroup => {
+						if (adminAccessGroup.length !== 0) {
+							throw new Error(
+								"Cannot delete admin access group!"
+							);
+						}
+						return mongoose
+							.model("AccessGroup")
+							.deleteMany({ _id: { $in: ids } });
+					})
+					.then(() => "ok");
+			});
 	},
 	deletePermission({ _id, permissionId }, req) {
 		return auth.loginRequired(req).then(() =>

@@ -94,7 +94,7 @@ const accessGroupMutation = new GraphQLObjectType({
 			}
 		},
 		delete: {
-			type: GraphQLList(GraphQLString),
+			type: GraphQLString,
 			description: "Delete access groups by specifying their IDs.",
 			args: {
 				ids: {
