@@ -412,7 +412,69 @@ describe("accessGroup", () => {
 			});
 
 			it("should validate user input");
-			it("should create a new access group entry");
+
+			it("should create a new access group entry", done => {
+				const accessGroup = {
+					name: "canCreateAccessGroup",
+					permissions: [
+						{
+							model: "accessGroup",
+							endpoint: "create"
+						}
+					]
+				};
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				mongoose
+					.model("AccessGroup")
+					.create(accessGroup)
+					.then(({ _id }) => {
+						return mongoose
+							.model("User")
+							.create(Object.assign(user, { access: _id }));
+					})
+					.then(user => {
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						const variables = {
+							name: "canGetAccessGroup",
+							permissions: [
+								{
+									model: "accessGroup",
+									endpoint: "get"
+								}
+							],
+							pagination: {}
+						};
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data).not.to.be.undefined;
+						expect(response.body.data.accessGroup).not.to.be
+							.undefined;
+						expect(response.body.data.accessGroup.create).not.to.be
+							.null;
+						expect(response.body.data.accessGroup.create._id).not.to
+							.be.undefined;
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
 		});
 
 		describe("delete", () => {
