@@ -546,7 +546,49 @@ describe("technology", () => {
 		});
 
 		describe("update", () => {
-			it("should require user to be logged in");
+			const query = `
+			mutation updateTechnology(
+			  	$_id: String = "",
+			  	$technology: TechnologyInput = {}
+			) {
+			  	technology {
+			    	update(_id: $_id, technology: $technology) {
+			      		_id
+			      		logo
+			    		name
+			    		focus
+			    		description
+			    		tags
+			    		features
+			    		innovations
+			    		repository
+			    		website
+			      		user
+			      		follows
+			      		date
+			    	}
+			  	}
+			}`;
+
+			it("should require user to be logged in", done => {
+				const variables = {
+					_id: mongoose.Types.ObjectId(),
+					technology: {}
+				};
+				helpers
+					.runQuery({ query, variables }, null, done)
+					.then(response => {
+						expect(response).to.not.be.undefined;
+						expect(response.body).to.not.be.undefined;
+						expect(response.body.errors).to.not.be.undefined;
+						expect(response.body.errors.length).to.not.equal(0);
+						const qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal("Login required!");
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should ensure user owns the technology");
 			it("should validate user input");
 			it("should update the specified technology entry");
