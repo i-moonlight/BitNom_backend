@@ -1252,6 +1252,66 @@ describe("accessGroup", () => {
 					.catch(helpers.logError(done));
 			});
 
+			it("should reject request to update own permissions", done => {
+				const accessGroup = {
+					name: "canUpdateAccessGroup",
+					permissions: [
+						{
+							model: "accessGroup",
+							endpoint: "update"
+						}
+					]
+				};
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				let accessGroupId;
+				mongoose
+					.model("AccessGroup")
+					.create(accessGroup)
+					.then(accessGroup => {
+						accessGroupId = accessGroup._id;
+						return mongoose.model("User").create(
+							Object.assign(user, {
+								access: accessGroup._id
+							})
+						);
+					})
+					.then(user => {
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						const variables = {
+							_id: accessGroupId,
+							name: "newName"
+						};
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.errors).not.to.be.undefined;
+						expect(response.body.errors.length).not.to.equal(0);
+						let qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal(
+							"Cannot modify own access group permissions!"
+						);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should reject request to update admin's permissions", done => {
 				const accessGroups = [
 					{

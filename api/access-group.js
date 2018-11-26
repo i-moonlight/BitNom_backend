@@ -94,6 +94,13 @@ module.exports = {
 		return auth
 			.loginRequired(req)
 			.then(() => auth.hasPermission(req, "accessGroup", "update"))
+			.then(() => {
+				if (String(_id) === String(req.user.access)) {
+					throw new Error(
+						"Cannot modify own access group permissions!"
+					);
+				}
+			})
 			.then(() => mongoose.model("AccessGroup").findById(_id))
 			.then(accessGroup => {
 				if (!accessGroup)
