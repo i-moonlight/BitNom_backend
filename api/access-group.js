@@ -69,8 +69,13 @@ module.exports = {
 			.then(() =>
 				auth.hasPermission(req, "accessGroup", "deletePermission")
 			)
-			.then(() =>
-				mongoose
+			.then(() => {
+				if (String(_id) === String(req.user.access)) {
+					throw new Error(
+						"Cannot delete permission from own access group!"
+					);
+				}
+				return mongoose
 					.model("AccessGroup")
 					.findById(_id)
 					.then(accessGroup => {
@@ -82,8 +87,8 @@ module.exports = {
 							);
 						accessGroup.permissions.pull(permissionId);
 						return accessGroup.save();
-					})
-			);
+					});
+			});
 	},
 	update({ _id, name, permission }, req) {
 		let updates = { name };
