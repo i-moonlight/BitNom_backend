@@ -755,7 +755,41 @@ describe("accessGroup", () => {
 		});
 
 		describe("deletePermission", () => {
-			it("should require user to be logged in");
+			const query = `
+			mutation deleteGroupPermission(
+			  	$_id:String = "",
+			  	$permissionId: String = ""
+			) {
+			  	accessGroup {
+			    	deletePermission(_id: $_id, permissionId: $permissionId) {
+			      		_id
+						name
+						permissions {
+							_id model endpoint
+						}
+			    	}
+			  	}
+			}`;
+
+			it("should require user to be logged in", done => {
+				const variables = {
+					_id: mongoose.Types.ObjectId(),
+					permissionId: mongoose.Types.ObjectId()
+				};
+				helpers
+					.runQuery({ query, variables }, null, done)
+					.then(response => {
+						expect(response).to.not.be.undefined;
+						expect(response.body).to.not.be.undefined;
+						expect(response.body.errors).to.not.be.undefined;
+						expect(response.body.errors.length).to.not.equal(0);
+						const qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal("Login required!");
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it(
 				"should ensure user has accessGroup-deletePermission permission"
 			);
