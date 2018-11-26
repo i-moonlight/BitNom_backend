@@ -792,7 +792,7 @@ describe("accessGroup", () => {
 
 			it("should require target access group to exist", done => {
 				const accessGroup = {
-					name: "canDeleteAccessGroup",
+					name: "canDeleteAccessGroupPermission",
 					permissions: [
 						{
 							model: "accessGroup",
@@ -910,7 +910,7 @@ describe("accessGroup", () => {
 
 			it("should reject request to delete own permission", done => {
 				const accessGroup = {
-					name: "canDeleteAccessGroup",
+					name: "canDeleteAccessGroupPermission",
 					permissions: [
 						{
 							model: "accessGroup",
@@ -980,7 +980,7 @@ describe("accessGroup", () => {
 						]
 					},
 					{
-						name: "canDeleteAccessGroup",
+						name: "canDeleteAccessGroupPermission",
 						permissions: [
 							{
 								model: "accessGroup",
@@ -1039,7 +1039,80 @@ describe("accessGroup", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should delete specified permissions");
+			it("should delete specified permissions", done => {
+				const accessGroups = [
+					{
+						name: "canDeleteAccessGroup",
+						permissions: [
+							{
+								model: "accessGroup",
+								endpoint: "delete"
+							}
+						]
+					},
+					{
+						name: "canDeleteAccessGroupPermission",
+						permissions: [
+							{
+								model: "accessGroup",
+								endpoint: "deletePermission"
+							}
+						]
+					}
+				];
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				let accessGroupId, permissionId;
+				mongoose
+					.model("AccessGroup")
+					.insertMany(accessGroups)
+					.then(accessGroups => {
+						accessGroupId = accessGroups[0]._id;
+						permissionId = accessGroups[0].permissions[0]._id;
+						return mongoose.model("User").create(
+							Object.assign(user, {
+								access: accessGroups[1]._id
+							})
+						);
+					})
+					.then(user => {
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						const variables = {
+							_id: accessGroupId,
+							permissionId
+						};
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data).not.to.be.undefined;
+						expect(response.body.data.accessGroup).not.to.be
+							.undefined;
+						expect(response.body.data.accessGroup.deletePermission)
+							.not.to.be.null;
+						expect(
+							response.body.data.accessGroup.deletePermission
+								.permissions.length
+						).to.equal(0);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
 		});
 
 		describe("update", () => {
