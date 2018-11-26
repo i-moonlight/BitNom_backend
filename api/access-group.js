@@ -76,6 +76,10 @@ module.exports = {
 					.then(accessGroup => {
 						if (!accessGroup)
 							throw new Error("Target resource does not exist!");
+						if (accessGroup.name === "admin")
+							throw new Error(
+								"Cannot delete permission from admin access group!"
+							);
 						accessGroup.permissions.pull(permissionId);
 						return accessGroup.save();
 					})
