@@ -1252,7 +1252,77 @@ describe("accessGroup", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should reject request to update for admin");
+			it("should reject request to update admin's permissions", done => {
+				const accessGroups = [
+					{
+						name: "admin",
+						permissions: [
+							{
+								model: "accessGroup",
+								endpoint: "update"
+							}
+						]
+					},
+					{
+						name: "canUpdateAccessGroup",
+						permissions: [
+							{
+								model: "accessGroup",
+								endpoint: "update"
+							}
+						]
+					}
+				];
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				let accessGroupId;
+				mongoose
+					.model("AccessGroup")
+					.insertMany(accessGroups)
+					.then(accessGroups => {
+						accessGroupId = accessGroups[0]._id;
+						return mongoose.model("User").create(
+							Object.assign(user, {
+								access: accessGroups[1]._id
+							})
+						);
+					})
+					.then(user => {
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						const variables = {
+							_id: accessGroupId,
+							name: "newName"
+						};
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.errors).not.to.be.undefined;
+						expect(response.body.errors.length).not.to.equal(0);
+						let qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal(
+							"Cannot modify admin access group permissions!"
+						);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should update specified access group");
 		});
 	});
