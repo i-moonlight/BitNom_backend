@@ -70,9 +70,7 @@ module.exports = {
 				.findById(_id)
 				.then(accessGroup => {
 					if (!accessGroup)
-						throw new Error(
-							"No access group was found using provided id!"
-						);
+						throw new Error("Target resource does not exist!");
 					accessGroup.permissions.pull(permissionId);
 					return accessGroup.save();
 				})
