@@ -90,21 +90,20 @@ module.exports = {
 					});
 			});
 	},
-	update({ _id, name, permission }, req) {
-		let updates = { name };
-		["create", "read", "update", "delete"].forEach(operation => {
-			updates["permissions.$." + operation] = permission[operation];
-		});
+	update({ _id, name, permissions }, req) {
 		return auth
 			.loginRequired(req)
-			.then(() =>
-				mongoose
-					.model("AccessGroup")
-					.findOneAndUpdate(
-						{ _id, "permissions.name": permission.name },
-						{ $set: updates },
-						{ new: true }
-					)
-			);
+			.then(() => mongoose.model("AccessGroup").findById(_id))
+			.then(accessGroup => {
+				if (!accessGroup)
+					throw new Error("Target resource does not exist!");
+				if (accessGroup.name === "admin")
+					throw new Error(
+						"Cannot modify admin access group permissions!"
+					);
+				if (name) accessGroup.name = name;
+				if (permissions) accessGroup.permissions = permissions;
+				return accessGroup.save();
+			});
 	}
 };
