@@ -1152,7 +1152,46 @@ describe("accessGroup", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should ensure user has accessGroup-update permission");
+			it("should ensure user has accessGroup-update permission", done => {
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				mongoose
+					.model("User")
+					.create(user)
+					.then(user => {
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						const variables = {
+							name: "new name",
+							_id: mongoose.Types.ObjectId()
+						};
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.errors).not.to.be.undefined;
+						expect(response.body.errors.length).not.to.equal(0);
+						let qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal("Permission denied!");
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should reject request to update for admin");
 			it("should update specified access group");
 		});
