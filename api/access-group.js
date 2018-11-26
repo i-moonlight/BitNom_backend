@@ -41,7 +41,7 @@ module.exports = {
 			.loginRequired(req)
 			.then(() => auth.hasPermission(req, "accessGroup", "delete"))
 			.then(() => {
-				if (ids.indexOf(String(req.user._id)) !== -1) {
+				if (ids.indexOf(String(req.user.access)) !== -1) {
 					throw new Error("Cannot delete own access group!");
 				}
 				return mongoose
