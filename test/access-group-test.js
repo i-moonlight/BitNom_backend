@@ -1383,7 +1383,90 @@ describe("accessGroup", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should update specified access group");
+			it("should update specified access group", done => {
+				const accessGroups = [
+					{
+						name: "canGetAccessGroup",
+						permissions: [
+							{
+								model: "accessGroup",
+								endpoint: "get"
+							}
+						]
+					},
+					{
+						name: "canUpdateAccessGroup",
+						permissions: [
+							{
+								model: "accessGroup",
+								endpoint: "update"
+							}
+						]
+					}
+				];
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				let accessGroupId;
+				mongoose
+					.model("AccessGroup")
+					.insertMany(accessGroups)
+					.then(accessGroups => {
+						accessGroupId = accessGroups[0]._id;
+						return mongoose.model("User").create(
+							Object.assign(user, {
+								access: accessGroups[1]._id
+							})
+						);
+					})
+					.then(user => {
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						const variables = {
+							_id: accessGroupId,
+							name: "newName",
+							permissions: [
+								{
+									model: "accessGroup",
+									endpoint: "get"
+								},
+								{
+									model: "accessGroup",
+									endpoint: "update"
+								}
+							]
+						};
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data).not.to.be.undefined;
+						expect(response.body.data.accessGroup.update).not.to.be
+							.null;
+						expect(
+							response.body.data.accessGroup.update.name
+						).to.equal("newName");
+						expect(
+							response.body.data.accessGroup.update.permissions
+								.length
+						).to.equal(2);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
 		});
 	});
 });
