@@ -64,17 +64,22 @@ module.exports = {
 			});
 	},
 	deletePermission({ _id, permissionId }, req) {
-		return auth.loginRequired(req).then(() =>
-			mongoose
-				.model("AccessGroup")
-				.findById(_id)
-				.then(accessGroup => {
-					if (!accessGroup)
-						throw new Error("Target resource does not exist!");
-					accessGroup.permissions.pull(permissionId);
-					return accessGroup.save();
-				})
-		);
+		return auth
+			.loginRequired(req)
+			.then(() =>
+				auth.hasPermission(req, "accessGroup", "deletePermission")
+			)
+			.then(() =>
+				mongoose
+					.model("AccessGroup")
+					.findById(_id)
+					.then(accessGroup => {
+						if (!accessGroup)
+							throw new Error("Target resource does not exist!");
+						accessGroup.permissions.pull(permissionId);
+						return accessGroup.save();
+					})
+			);
 	},
 	update({ _id, name, permission }, req) {
 		let updates = { name };
