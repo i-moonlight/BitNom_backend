@@ -131,8 +131,8 @@ const accessGroupMutation = new GraphQLObjectType({
 					type: GraphQLString,
 					description: "The new name of the access group."
 				},
-				permission: {
-					type: GraphQLNonNull(permissionsInput),
+				permissions: {
+					type: GraphQLList(permissionsInput),
 					description:
 						"The new permissions. NOTE: The name is not updateable."
 				}

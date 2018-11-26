@@ -1116,7 +1116,42 @@ describe("accessGroup", () => {
 		});
 
 		describe("update", () => {
-			it("should require user to be logged in");
+			const query = `
+			mutation updateGroup(
+			  	$_id:String = "",
+			  	$name:String = "",
+			  	$permissions: [PermissionsInput] = []
+			) {
+			  	accessGroup {
+			    	update(_id: $_id, name: $name, permissions: $permissions) {
+			      		_id
+						name
+						permissions {
+							_id model endpoint owned
+						}
+			    	}
+			  	}
+			}`;
+
+			it("should require user to be logged in", done => {
+				const variables = {
+					name: "new access group",
+					_id: ""
+				};
+				helpers
+					.runQuery({ query, variables }, null, done)
+					.then(response => {
+						expect(response).to.not.be.undefined;
+						expect(response.body).to.not.be.undefined;
+						expect(response.body.errors).to.not.be.undefined;
+						expect(response.body.errors.length).to.not.equal(0);
+						const qlRes = response.body.errors[0];
+						expect(qlRes.message).to.equal("Login required!");
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
+
 			it("should ensure user has accessGroup-update permission");
 			it("should reject request to update for admin");
 			it("should update specified access group");
