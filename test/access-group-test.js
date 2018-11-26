@@ -680,7 +680,78 @@ describe("accessGroup", () => {
 					.catch(helpers.logError(done));
 			});
 
-			it("should delete specified access groups");
+			it("should delete specified access groups", done => {
+				const accessGroups = [
+					{
+						name: "canGetAccessGroup",
+						permissions: [
+							{
+								model: "accessGroup",
+								endpoint: "get"
+							}
+						]
+					},
+					{
+						name: "canDeleteAccessGroup",
+						permissions: [
+							{
+								model: "accessGroup",
+								endpoint: "delete"
+							}
+						]
+					}
+				];
+				const user = {
+					email: "example@email.com",
+					access: mongoose.Types.ObjectId(),
+					date: new Date(),
+					password: "password",
+					verificationString: "verificationString"
+				};
+				let accessGroupId;
+				mongoose
+					.model("AccessGroup")
+					.insertMany(accessGroups)
+					.then(accessGroups => {
+						accessGroupId = accessGroups[0]._id;
+						return mongoose.model("User").create(
+							Object.assign(user, {
+								access: accessGroups[1]._id
+							})
+						);
+					})
+					.then(user => {
+						return helpers.login(
+							"example@email.com",
+							"password",
+							done
+						);
+					})
+					.then(token => {
+						const variables = {
+							ids: [accessGroupId],
+							pagination: {}
+						};
+						return helpers.runQuery(
+							{ query, variables },
+							token,
+							done
+						);
+					})
+					.then(response => {
+						expect(response).not.to.be.undefined;
+						expect(response.body.data).not.to.be.undefined;
+						expect(response.body.data.accessGroup.delete).to.equal(
+							"ok"
+						);
+					})
+					.then(() => mongoose.model("AccessGroup").find({}))
+					.then(accessGroups => {
+						expect(accessGroups.length).to.equal(1);
+						done();
+					})
+					.catch(helpers.logError(done));
+			});
 		});
 
 		describe("deletePermission", () => {
