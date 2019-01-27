@@ -4,18 +4,32 @@ const mongoose = require("mongoose");
 
 // define the schema
 const schema = mongoose.Schema({
-	// fields
-	coinName: { type: String },
+	name: { type: String },
 	abbreviation: { type: String },
-	topicName: { type: String },
-	topicLink: { type: String },
-	githubLink: { type: String },
-	startedBy: { type: String },
-	profileLink: { type: String },
-	replies: { type: String },
-	views: { type: String },
-	lastPostDate: { type: Date },
-	announcementDate: { type: Date },
+	topic: {
+		title: { type: String },
+		link: { type: String, unique: true },
+		startedBy: {
+			username: { type: String },
+			profile: { type: String }
+		},
+		replies: [
+			{
+				no: { type: Number },
+				date: { type: Date }
+			}
+		],
+		views: [
+			{
+				no: { type: Number },
+				date: { type: Date }
+			}
+		],
+		lastPostDate: { type: Date },
+		announcementDate: { type: Date },
+		githubLinks: [{ type: String }],
+		parsed: { type: Boolean, default: false }
+	},
 	github: {
 		watch: { type: Number },
 		stars: { type: Number },
@@ -26,11 +40,10 @@ const schema = mongoose.Schema({
 		branches: { type: Number },
 		releases: { type: Number },
 		contributors: { type: Number },
-		repository: { type: String }
+		link: { type: String }
 	}
 });
 
-schema.index({ coinName: "text", topicName: "text" });
+schema.index({ name: "text", "topic.name": "text" });
 
-mongoose.model("Complete", schema);
-mongoose.model("Partial", schema);
+mongoose.model("Coin", schema);

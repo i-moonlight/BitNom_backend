@@ -7,28 +7,23 @@ const helpers = require("./test-helpers");
 
 describe("coin", () => {
 	describe("query", () => {
-		beforeEach(done => {
-			mongoose
-				.model("Partial")
-				.deleteMany({})
-				.then(() => mongoose.model("Complete").deleteMany({}))
-				.then(() => done())
-				.catch(done);
-		});
-
 		let coins = [
 			{
-				coinName: "Coin",
+				name: "Coin",
 				abbreviation: "CXN",
-				topicName: "All about Coin",
-				topicLink: "http://to.coin.com",
-				githubLink: "http://github.com/coin",
-				startedBy: "starter",
-				profileLink: "http://profile.com/starter",
-				replies: 2000,
-				views: 300,
-				lastPostDate: new Date(),
-				announcementDate: new Date(),
+				topic: {
+					title: "All about Coin",
+					link: "http://to.coin.com",
+					githubLinks: ["http://github.com/coin"],
+					startedBy: {
+						username: "starter",
+						profile: "http://profile.com/starter"
+					},
+					replies: [{ no: 2000, date: new Date() }],
+					views: [{ no: 300, date: new Date() }],
+					lastPostDate: new Date(),
+					announcementDate: new Date()
+				},
 				github: {
 					watch: 20,
 					stars: 5,
@@ -39,21 +34,25 @@ describe("coin", () => {
 					branches: 1,
 					releases: 2,
 					contributors: 1,
-					repository: "http://github.com/coin.git"
+					link: "http://github.com/coin.git"
 				}
 			},
 			{
-				coinName: "ZenCoin",
+				name: "ZenCoin",
 				abbreviation: "ZNC",
-				topicName: "All about ZenCoin",
-				topicLink: "http://zencoin.com",
-				githubLink: "http://github.com/zencoin",
-				startedBy: "bystander",
-				profileLink: "http://profile.com/bystander",
-				replies: 2000,
-				views: 300,
-				lastPostDate: new Date(),
-				announcementDate: new Date(),
+				topic: {
+					title: "All about ZenCoin",
+					link: "http://zencoin.com",
+					githubLinks: ["http://github.com/zencoin"],
+					startedBy: {
+						username: "bystander",
+						profile: "http://profile.com/bystander"
+					},
+					replies: [{ no: 2000, date: new Date() }],
+					views: [{ no: 300, date: new Date() }],
+					lastPostDate: new Date(),
+					announcementDate: new Date()
+				},
 				github: {
 					watch: 20,
 					stars: 5,
@@ -71,16 +70,10 @@ describe("coin", () => {
 
 		beforeEach(done => {
 			mongoose
-				.model("Partial")
-				.insertMany(coins)
-				.then(partialCoins => {
-					return mongoose
-						.model("Complete")
-						.insertMany(coins)
-						.then(completeCoins => {
-							coins = partialCoins.concat(completeCoins);
-						});
-				})
+				.model("Coin")
+				.deleteMany({})
+				.then(() => mongoose.model("Coin").insertMany(coins))
+				.then(savedCoins => (coins = savedCoins))
 				.then(() => done())
 				.catch(done);
 		});
@@ -88,7 +81,7 @@ describe("coin", () => {
 		describe("get", () => {
 			const query = `
 			query getCoin(
-				$_id: String = "",
+				$_id: ID = "",
 				$partial: Boolean = false,
 				$pagination: PaginationInput = {
 					limit: 20,
@@ -97,12 +90,18 @@ describe("coin", () => {
 			) {
 				coin {
 					get(_id: $_id, partial: $partial, pagination: $pagination) {
-						_id coinName abbreviation topicName topicLink githubLink
-						startedBy profileLink replies views lastPostDate
-						announcementDate
+						_id name abbreviation topic {
+							title link githubLinks startedBy {
+								username
+								profile
+							}
+							replies { _id no date }
+							views { _id no date }
+							lastPostDate announcementDate
+						}
 						github {
 							watch stars forks issues pulls commits branches releases
-							contributors repository
+							contributors link
 						}
 					}
 				}

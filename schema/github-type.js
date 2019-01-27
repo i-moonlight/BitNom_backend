@@ -44,7 +44,7 @@ module.exports = new GraphQLObjectType({
 				type: GraphQLInt,
 				description: "The contributers to the coin's repository."
 			},
-			repository: {
+			link: {
 				type: GraphQLString,
 				description: "The absolute link to the coin's repository."
 			}

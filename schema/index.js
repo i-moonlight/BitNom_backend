@@ -19,12 +19,7 @@ const {
 	SourceCode
 } = require("../api");
 
-const {
-	coinQuery,
-	coinMutation,
-	completeType,
-	partialType
-} = require("./coin");
+const { coinQuery, coinMutation } = require("./coin");
 const { userQuery, userMutation } = require("./user");
 const { technologyQuery, technologyMutation } = require("./technology");
 const { accessGroupQuery, accessGroupMutation } = require("./access-group");
@@ -96,6 +91,5 @@ module.exports = new GraphQLSchema({
 				resolve: () => SourceCode
 			}
 		}
-	}),
-	types: [completeType, partialType]
+	})
 });
