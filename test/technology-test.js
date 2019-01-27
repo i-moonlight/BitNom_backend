@@ -5,7 +5,7 @@ const { expect } = require("chai");
 
 const helpers = require("./test-helpers");
 
-xdescribe("technology", () => {
+describe("technology", () => {
 	describe("query", () => {
 		beforeEach(done => {
 			mongoose
