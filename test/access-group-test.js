@@ -5,7 +5,7 @@ const { expect } = require("chai");
 
 const helpers = require("./test-helpers");
 
-xdescribe("accessGroup", () => {
+describe("accessGroup", () => {
 	describe("query", () => {
 		beforeEach(done => {
 			mongoose
