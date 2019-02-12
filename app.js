@@ -1,5 +1,7 @@
 "use strict";
 
+const cors = require("cors");
+const path = require("path");
 const express = require("express");
 const graphqlHTTP = require("express-graphql");
 const mongoose = require("mongoose");
@@ -9,48 +11,37 @@ const app = express();
 
 const config = require("./config");
 
-const envConfig = process.env.PRODUCTION
-	? config.production
-	: config.development;
-
 const graphqlSchema = require("./schema");
 
-mongoose.connect(
-	envConfig.dbUrl,
-	{
-		useCreateIndex: true,
-		useNewUrlParser: true
-	}
-);
+mongoose.connect(process.env.DB_URL || config.dbUrl, {
+	useCreateIndex: true,
+	useNewUrlParser: true
+});
+
+// Enable CORS
+app.use(cors());
+app.use("*", cors());
 
 // authentication middleware
 const authMiddleware = jwt({
-	secret: config.secret,
+	secret: process.env.APP_SECRET || config.secret,
 	credentialsRequired: false,
 	session: false
 });
 app.use("/graphql", authMiddleware);
 
-// Enable CORS
-app.use(function(req, res, next) {
-	res.header("Access-Control-Allow-Origin", "*");
-	res.header(
-		"Access-Control-Allow-Headers",
-		"Origin, X-Requested-With, Content-Type, Accept"
-	);
-	next();
-});
-
 app.use(
 	"/graphql",
 	graphqlHTTP({
 		schema: graphqlSchema,
-		graphiql: envConfig.graphiql
+		graphiql: process.env.GRAPHIQL || config.graphiql
 	})
 );
 
-app.get("/", (req, res) => res.send("Hello World!"));
+app.use(express.static(path.join(__dirname, "dist")));
 
-app.listen(envConfig.port, () =>
-	console.log(`Example app listening on port ${envConfig.port}!`)
+app.listen(process.env.APP_PORT || config.port, () =>
+	console.log(
+		`Example app listening on port ${process.env.APP_PORT || config.port}!`
+	)
 );

@@ -31,7 +31,10 @@ schema.index({ email: 1 }, { unique: true });
 schema.index({ email: "text", displayName: "text" });
 
 schema.virtual("password").set(function(value) {
-	this.hash = bcrypt.hashSync(value, config.saltRounds);
+	this.hash = bcrypt.hashSync(
+		value,
+		Number(process.env.SALT_ROUNDS) || config.saltRounds
+	);
 });
 
 schema.methods.isPassword = function(password) {

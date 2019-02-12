@@ -23,7 +23,7 @@ module.exports = ({ email, password }) => {
             _id: user._id,
             access: user.access
           },
-          config.secret,
+          process.env.APP_SECRET || config.secret,
           { expiresIn: "1y" }
         );
       });

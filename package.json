@@ -19,6 +19,7 @@
   "homepage": "https://gitlab.com/bitnorm/backend#readme",
   "dependencies": {
     "bcrypt": "^3.0.2",
+    "cors": "^2.8.5",
     "express": "^4.16.4",
     "express-graphql": "^0.7.1",
     "express-jwt": "^5.3.1",
