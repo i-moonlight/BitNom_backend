@@ -7,20 +7,15 @@ const helpers = require("./test-helpers");
 
 before(done => {
 	require("../models")();
-	const config = process.env.PRODUCTION
-		? require("../config").production
-		: require("../config").development;
+	const config = require("../config");
 
 	console.log("Setting up database ... ");
 
 	mongoose
-		.connect(
-			config.dbUrl,
-			{
-				useCreateIndex: true,
-				useNewUrlParser: true
-			}
-		)
+		.connect(config.dbUrl, {
+			useCreateIndex: true,
+			useNewUrlParser: true
+		})
 		.then(() => done())
 		.catch(done);
 });
