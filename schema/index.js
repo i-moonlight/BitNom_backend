@@ -24,11 +24,16 @@ const { userQuery, userMutation } = require("./user");
 const { technologyQuery, technologyMutation } = require("./technology");
 const { accessGroupQuery, accessGroupMutation } = require("./access-group");
 const { sourceCodeQuery, sourceCodeMutation } = require("./source-code");
+const schemaEndpoints = require("./schema-endpoints");
 
 module.exports = new GraphQLSchema({
 	query: new GraphQLObjectType({
 		name: "RootQueryType",
 		fields: {
+			schemaEndpoints: {
+				type: GraphQLString,
+				resolve: () => JSON.stringify(schemaEndpoints)
+			},
 			accessGroup: {
 				type: accessGroupQuery,
 				resolve: () => AccessGroup
