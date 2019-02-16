@@ -142,7 +142,7 @@ module.exports = {
 							.model("AccessGroup")
 							.findById(user.access)
 							.then(group => {
-								if (group.name === "admin") {
+								if (group && group.name === "admin") {
 									throw new Error(
 										"Cannot modify admin's access group!"
 									);
