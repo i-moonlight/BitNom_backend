@@ -108,6 +108,11 @@ const threadInput = new GraphQLInputObjectType({
 		srccodes: {
 			type: GraphQLList(GraphQLString),
 			description: "The source code snippets associated with a thread."
+		},
+		resource: {
+			type: GraphQLID,
+			description:
+				"The ID of the resource to which the thread belongs to."
 		}
 	})
 });

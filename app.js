@@ -5,7 +5,9 @@ const path = require("path");
 const express = require("express");
 const graphqlHTTP = require("express-graphql");
 const mongoose = require("mongoose");
+const superagent = require("superagent");
 const jwt = require("express-jwt");
+const bodyParser = require("body-parser");
 
 const app = express();
 
@@ -92,6 +94,22 @@ app.use(
 );
 
 app.use(express.static(path.join(__dirname, "dist")));
+
+app.use(bodyParser.json());
+
+app.post("/github", (req, res) => {
+	console.log(req);
+	const query = req.body;
+	if (!query.query)
+		return res.status(400).json({ message: "A query is required" });
+	const githubToken = process.env.GITHUB_TOKEN || config.githubToken;
+	return superagent
+		.post("https://api.github.com/graphql")
+		.set("Authorization", `Bearer ${githubToken}`)
+		.send(query)
+		.then(({ body }) => res.json(body))
+		.catch(error => res.status(error.status).send(error.response.text));
+});
 
 app.listen(process.env.APP_PORT || config.port, () =>
 	console.log(
