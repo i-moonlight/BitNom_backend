@@ -19,6 +19,7 @@
   "homepage": "https://gitlab.com/bitnorm/backend#readme",
   "dependencies": {
     "bcrypt": "^3.0.2",
+    "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "express-graphql": "^0.7.1",
@@ -27,11 +28,11 @@
     "jsonwebtoken": "^8.3.0",
     "mongoose": "^5.3.8",
     "randomstring": "^1.1.5",
+    "superagent": "^4.1.0",
     "validator": "^10.8.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^5.2.0",
-    "superagent": "^4.0.0-beta.5"
+    "mocha": "^5.2.0"
   }
 }

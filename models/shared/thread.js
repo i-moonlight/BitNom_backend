@@ -15,11 +15,8 @@ const schema = mongoose.Schema({
 	},
 	srccodes: [{ type: String }],
 	user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-	upvotes: { type: Number, min: 0, default: 0, required: true },
-	downvotes: { type: Number, min: 0, default: 0, required: true },
-	flags: { type: Number, min: 0, default: 0, required: true },
 	date: { type: Date, required: true },
-	coin: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }
+	resource: { type: mongoose.Schema.Types.ObjectId, required: true }
 });
 
 mongoose.model("Thread", schema);
