@@ -11,8 +11,13 @@ const schema = new mongoose.Schema({
 		required: true,
 		validate: validators("email")
 	},
-	avatar: { type: String, required: true, default: "avatar.png" },
-	displayName: { type: String, validate: validators("alpha") },
+	avatar: { type: String },
+	displayName: {
+		type: String,
+		validate: validators("alpha"),
+		required: true
+	},
+	slogan: { type: String },
 	access: {
 		type: mongoose.Schema.Types.ObjectId,
 		required: true,

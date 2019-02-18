@@ -16,14 +16,15 @@ const {
 	login,
 	AccessGroup,
 	Technology,
-	SourceCode
+	TechnologyThread,
+	CoinThread
 } = require("../api");
 
 const { coinQuery, coinMutation } = require("./coin");
 const { userQuery, userMutation } = require("./user");
 const { technologyQuery, technologyMutation } = require("./technology");
 const { accessGroupQuery, accessGroupMutation } = require("./access-group");
-const { sourceCodeQuery, sourceCodeMutation } = require("./source-code");
+const { threadQuery, threadMutation } = require("./thread");
 const schemaEndpoints = require("./schema-endpoints");
 
 module.exports = new GraphQLSchema({
@@ -50,9 +51,13 @@ module.exports = new GraphQLSchema({
 				type: technologyQuery,
 				resolve: () => Technology
 			},
-			sourceCode: {
-				type: sourceCodeQuery,
-				resolve: () => SourceCode
+			technologyThread: {
+				type: threadQuery,
+				resolve: () => TechnologyThread
+			},
+			coinThread: {
+				type: threadQuery,
+				resolve: () => CoinThread
 			},
 			login: {
 				type: GraphQLString,
@@ -91,9 +96,13 @@ module.exports = new GraphQLSchema({
 				type: coinMutation,
 				resolve: () => Coin
 			},
-			sourceCode: {
-				type: sourceCodeMutation,
-				resolve: () => SourceCode
+			technologyThread: {
+				type: threadMutation,
+				resolve: () => TechnologyThread
+			},
+			coinThread: {
+				type: threadMutation,
+				resolve: () => CoinThread
 			}
 		}
 	})

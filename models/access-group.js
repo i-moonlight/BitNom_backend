@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const schema = mongoose.Schema({
 	// fields
 	name: { type: String, required: true },
+	points: { type: Number },
 	permissions: [
 		{
 			model: { type: String, required: true },

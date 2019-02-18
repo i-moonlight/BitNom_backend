@@ -11,6 +11,7 @@ module.exports = {
 		if (_id) params._id = _id;
 		if (email) params.email = email;
 		if (access) params.access = access;
+		pagination = pagination || {};
 		return auth
 			.loginRequired(req)
 			.then(() => auth.hasPermission(req, "user", "get"))
@@ -18,9 +19,17 @@ module.exports = {
 				return mongoose
 					.model("User")
 					.find(params)
-					.limit(pagination.limit)
-					.skip(pagination.skip);
+					.limit(pagination.limit || 20)
+					.skip(pagination.skip || 0);
 			});
+	},
+	count({ params }, req) {
+		return auth.then(() => mongoose.model("Thread").count(params));
+	},
+	me(_, req) {
+		return auth
+			.loginRequired(req)
+			.then(() => mongoose.model("User").findById(req.user._id));
 	},
 	search({ access, searchString, pagination }, req) {
 		let params = {};
@@ -40,10 +49,11 @@ module.exports = {
 					.skip(pagination.skip);
 			});
 	},
-	create({ email, password }) {
+	create({ email, password, displayName }) {
 		const user = {
 			email,
 			password,
+			displayName,
 			date: new Date(),
 			access: mongoose.Types.ObjectId(),
 			verificationString: randomstring.generate(8)
@@ -153,12 +163,13 @@ module.exports = {
 					});
 			});
 	},
-	updateDisplayName({ displayName }, req) {
+	update({ displayName, slogan }, req) {
 		return auth
 			.loginRequired(req)
 			.then(() => mongoose.model("User").findById(req.user._id))
 			.then(user => {
 				user.displayName = displayName;
+				user.slogan = slogan;
 				return user.save();
 			});
 	}

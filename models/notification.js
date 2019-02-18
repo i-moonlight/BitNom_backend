@@ -7,7 +7,8 @@ const schema = mongoose.Schema({
 	// fields
 	avatar: { type: String, required: true },
 	user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-	link: { type: String },
+	model: { type: String, required: true },
+	resource: { type: mongoose.Schema.Types.ObjectId, required: true },
 	title: { type: String, required: true },
 	description: { type: String, required: true },
 	upvotes: { type: Number, min: 0, default: 0, required: true },

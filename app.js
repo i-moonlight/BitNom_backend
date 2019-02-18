@@ -54,7 +54,6 @@ mongoose
 				if (!savedAdmin) {
 					return mongoose.model("User").create({
 						email: "admin@email.com",
-						avatar: "avatar.png",
 						displayName: "Admin",
 						access: savedAdminAccessGroup._id,
 						date: new Date(),
