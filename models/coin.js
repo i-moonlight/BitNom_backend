@@ -6,6 +6,9 @@ const mongoose = require("mongoose");
 const schema = mongoose.Schema({
 	name: { type: String },
 	abbreviation: { type: String },
+	logo: { type: String },
+	about: { type: String },
+	description: { type: String },
 	topic: {
 		title: { type: String },
 		link: { type: String, unique: true },

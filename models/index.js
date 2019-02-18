@@ -13,7 +13,10 @@ module.exports = () => {
 	require("./coin");
 	require("./user");
 	require("./access-group");
+	require("./coin-vote");
 	require("./vote");
 	require("./technology");
 	require("./source-code");
+	require("./coin-thread");
+	require("./technology-thread");
 };

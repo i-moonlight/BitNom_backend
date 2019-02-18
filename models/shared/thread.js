@@ -5,7 +5,6 @@ const mongoose = require("mongoose");
 // define the schema
 const schema = mongoose.Schema({
 	// fields
-	avatar: { type: String, required: true },
 	title: { type: String, required: true },
 	description: { type: String, required: true },
 	category: {

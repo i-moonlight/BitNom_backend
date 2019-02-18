@@ -88,4 +88,33 @@ const technologyInput = new GraphQLInputObjectType({
 	})
 });
 
-module.exports = { paginationInput, permissionsInput, technologyInput };
+const threadInput = new GraphQLInputObjectType({
+	name: "ThreadInput",
+	description: "Input fields for a technology",
+	fields: () => ({
+		title: {
+			type: GraphQLString,
+			description: "The thread's title."
+		},
+		description: {
+			type: GraphQLString,
+			description: "The thread's description."
+		},
+		category: {
+			type: GraphQLString,
+			description:
+				"The category under which the thread is classified (feature|srccode|other)."
+		},
+		srccodes: {
+			type: GraphQLList(GraphQLString),
+			description: "The source code snippets associated with a thread."
+		}
+	})
+});
+
+module.exports = {
+	paginationInput,
+	permissionsInput,
+	technologyInput,
+	threadInput
+};

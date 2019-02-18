@@ -29,9 +29,21 @@ const coinType = new GraphQLObjectType({
 				type: GraphQLString,
 				description: "The coin's name."
 			},
+			logo: {
+				type: GraphQLString,
+				description: "The coin's logo."
+			},
 			abbreviation: {
 				type: GraphQLString,
 				description: "The coin's abbreviation."
+			},
+			about: {
+				type: GraphQLString,
+				description: "A short string describing the coin."
+			},
+			description: {
+				type: GraphQLString,
+				description: "A string describing what the coin is all about."
 			},
 			topic: {
 				type: topicType,
@@ -69,6 +81,16 @@ const coinQuery = new GraphQLObjectType({
 					type: paginationInput,
 					description:
 						"Specifies the bounds of the data to be returned."
+				}
+			}
+		},
+		count: {
+			type: GraphQLInt,
+			description: "The number of coins.",
+			args: {
+				partial: {
+					type: GraphQLBoolean,
+					description: "Specifies what the count represents."
 				}
 			}
 		},

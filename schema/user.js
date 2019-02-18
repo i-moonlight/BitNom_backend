@@ -1,10 +1,12 @@
 "use strict";
 
 const {
+	GraphQLBoolean,
 	GraphQLObjectType,
 	GraphQLString,
 	GraphQLNonNull,
-	GraphQLList
+	GraphQLList,
+	GraphQLInt
 } = require("graphql");
 
 const { paginationInput } = require("./input-types");
@@ -33,6 +35,23 @@ const userType = new GraphQLObjectType({
 			access: {
 				type: GraphQLString,
 				description: "ID of the access group to which the user belongs."
+			},
+			date: {
+				type: GraphQLString,
+				description: "The user's signup date."
+			},
+			credits: {
+				type: GraphQLInt,
+				description: "The credits earned by the user."
+			},
+			verified: {
+				type: GraphQLBoolean,
+				description:
+					"A boolean indicating if the user has verified their account."
+			},
+			slogan: {
+				type: GraphQLString,
+				description: "A user provided string."
 			}
 		};
 	}
@@ -64,6 +83,10 @@ const userQuery = new GraphQLObjectType({
 				pagination: { type: GraphQLNonNull(paginationInput) }
 			}
 		},
+		me: {
+			type: userType,
+			description: "Returns the currently logged in user."
+		},
 		search: {
 			type: GraphQLList(userType),
 			args: {
@@ -93,12 +116,16 @@ const userMutation = new GraphQLObjectType({
 		create: {
 			type: userType,
 			args: {
+				displayName: {
+					type: GraphQLNonNull(GraphQLString),
+					description: `The user's desired display name`
+				},
 				email: {
-					type: GraphQLString,
+					type: GraphQLNonNull(GraphQLString),
 					description: `An email to uniquely identify a user.`
 				},
 				password: {
-					type: GraphQLString,
+					type: GraphQLNonNull(GraphQLString),
 					description: `A password to authenticate the user.`
 				}
 			}
@@ -122,13 +149,17 @@ const userMutation = new GraphQLObjectType({
 				}
 			}
 		},
-		updateDisplayName: {
+		update: {
 			type: userType,
 			description: "Update the display name of a given user.",
 			args: {
 				displayName: {
 					type: GraphQLString,
 					description: "The new display name of the user."
+				},
+				slogan: {
+					type: GraphQLString,
+					description: "The user's preferred slogan."
 				}
 			}
 		},
