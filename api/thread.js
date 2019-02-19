@@ -8,10 +8,10 @@ module.exports = model => ({
 		return auth
 			.loginRequired(req)
 			.then(() => auth.hasPermission(req, "thread", "create"))
-			.then(() => mongoose.model("Coin").findById(thread.coin))
-			.then(coin => {
-				if (!coin)
-					return Promise.reject("Specified coin does not exist");
+			.then(() => mongoose.model("Coin").findById(thread.resource))
+			.then(resource => {
+				if (!resource)
+					return Promise.reject("Specified resource does not exist");
 			})
 			.then(() => {
 				thread.date = new Date();

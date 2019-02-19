@@ -6,7 +6,8 @@ const {
 	GraphQLString,
 	GraphQLBoolean,
 	GraphQLNonNull,
-	GraphQLList
+	GraphQLList,
+	GraphQLID
 } = require("graphql");
 
 const paginationInput = new GraphQLInputObjectType({
