@@ -8,6 +8,7 @@ const mongoose = require("mongoose");
 const superagent = require("superagent");
 const jwt = require("express-jwt");
 const bodyParser = require("body-parser");
+const fallback = require("express-history-api-fallback");
 
 const app = express();
 
@@ -93,7 +94,10 @@ app.use(
 	})
 );
 
-app.use(express.static(path.join(__dirname, "dist")));
+// Support SPA routing
+const appRoot = path.join(__dirname, "dist");
+app.use(express.static(appRoot));
+app.use(fallback("index.html", { root: appRoot }));
 
 app.use(bodyParser.json());
 

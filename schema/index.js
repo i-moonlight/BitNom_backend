@@ -17,7 +17,8 @@ const {
 	AccessGroup,
 	Technology,
 	TechnologyThread,
-	CoinThread
+	CoinThread,
+	Message
 } = require("../api");
 
 const { coinQuery, coinMutation } = require("./coin");
@@ -25,6 +26,8 @@ const { userQuery, userMutation } = require("./user");
 const { technologyQuery, technologyMutation } = require("./technology");
 const { accessGroupQuery, accessGroupMutation } = require("./access-group");
 const { threadQuery, threadMutation } = require("./thread");
+const { messageQuery, messageMutation } = require("./message");
+
 const schemaEndpoints = require("./schema-endpoints");
 
 module.exports = new GraphQLSchema({
@@ -58,6 +61,10 @@ module.exports = new GraphQLSchema({
 			coinThread: {
 				type: threadQuery,
 				resolve: () => CoinThread
+			},
+			message: {
+				type: messageQuery,
+				resolve: () => Message
 			},
 			login: {
 				type: GraphQLString,
@@ -103,6 +110,10 @@ module.exports = new GraphQLSchema({
 			coinThread: {
 				type: threadMutation,
 				resolve: () => CoinThread
+			},
+			message: {
+				type: messageMutation,
+				resolve: () => Message
 			}
 		}
 	})

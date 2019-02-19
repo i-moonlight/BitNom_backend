@@ -10,5 +10,6 @@ module.exports = {
 	Technology: require("./technology"),
 	SourceCode: require("./source-code"),
 	CoinThread: require("./thread")("CoinThread"),
-	TechnologyThread: require("./thread")("TechnologyThread")
+	TechnologyThread: require("./thread")("TechnologyThread"),
+	Message: require("./message")
 };

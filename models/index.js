@@ -19,4 +19,5 @@ module.exports = () => {
 	require("./source-code");
 	require("./coin-thread");
 	require("./technology-thread");
+	require("./message");
 };
