@@ -133,7 +133,7 @@ const threadMutation = new GraphQLObjectType({
 			type: threadType,
 			description: "Create a thread",
 			args: {
-				thread: { type: threadInput }
+				thread: { type: GraphQLNonNull(threadInput) }
 			}
 		},
 		update: {
@@ -141,10 +141,10 @@ const threadMutation = new GraphQLObjectType({
 			description: "Create a thread",
 			args: {
 				_id: {
-					type: GraphQLID,
+					type: GraphQLNonNull(GraphQLID),
 					description: "The ID of the thread to be updated."
 				},
-				thread: { type: threadInput }
+				thread: { type: GraphQLNonNull(threadInput) }
 			}
 		},
 		delete: {
@@ -152,7 +152,7 @@ const threadMutation = new GraphQLObjectType({
 			description: "Create a thread",
 			args: {
 				_id: {
-					type: GraphQLID,
+					type: GraphQLNonNull(GraphQLID),
 					description: "The ID of the thread to be updated."
 				}
 			}

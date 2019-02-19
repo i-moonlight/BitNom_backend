@@ -98,7 +98,6 @@ app.use(express.static(path.join(__dirname, "dist")));
 app.use(bodyParser.json());
 
 app.post("/github", (req, res) => {
-	console.log(req);
 	const query = req.body;
 	if (!query.query)
 		return res.status(400).json({ message: "A query is required" });

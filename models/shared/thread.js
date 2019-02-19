@@ -3,7 +3,7 @@
 const mongoose = require("mongoose");
 
 // define the schema
-const schema = mongoose.Schema({
+module.exports = mongoose.Schema({
 	// fields
 	title: { type: String, required: true },
 	description: { type: String, required: true },
@@ -18,5 +18,3 @@ const schema = mongoose.Schema({
 	date: { type: Date, required: true },
 	resource: { type: mongoose.Schema.Types.ObjectId, required: true }
 });
-
-mongoose.model("Thread", schema);
