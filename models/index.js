@@ -20,4 +20,5 @@ module.exports = () => {
 	require("./coin-thread");
 	require("./technology-thread");
 	require("./message");
+	require("./feedback");
 };
