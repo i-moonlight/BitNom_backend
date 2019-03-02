@@ -26,7 +26,7 @@ const messageType = new GraphQLObjectType({
 			type: GraphQLID,
 			description: "ID of the sender."
 		},
-		recepient: {
+		recipient: {
 			type: GraphQLID,
 			description: "ID of the recepient."
 		},

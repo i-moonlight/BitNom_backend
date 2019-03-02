@@ -14,7 +14,7 @@ const {
 const { paginationInput } = require("./input-types");
 const voteType = require("./vote-type");
 const topicType = require("./topic-type");
-const githubType = require("./github-type");
+const { githubType } = require("./github-type");
 
 const coinType = new GraphQLObjectType({
 	name: "CoinType",

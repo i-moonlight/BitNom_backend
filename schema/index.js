@@ -19,7 +19,8 @@ const {
 	TechnologyThread,
 	CoinThread,
 	Message,
-	Feedback
+	Feedback,
+	ResourceMessage
 } = require("../api");
 
 const { coinQuery, coinMutation } = require("./coin");
@@ -29,6 +30,10 @@ const { accessGroupQuery, accessGroupMutation } = require("./access-group");
 const { threadQuery, threadMutation } = require("./thread");
 const { messageQuery, messageMutation } = require("./message");
 const { feedbackQuery, feedbackMutation } = require("./feedback");
+const {
+	resourceMessageQuery,
+	resourceMessageMutation
+} = require("./resource-message");
 
 const schemaEndpoints = require("./schema-endpoints");
 
@@ -71,6 +76,10 @@ module.exports = new GraphQLSchema({
 			feedback: {
 				type: feedbackQuery,
 				resolve: () => Feedback
+			},
+			resourceMessage: {
+				type: resourceMessageQuery,
+				resolve: () => ResourceMessage
 			},
 			login: {
 				type: GraphQLString,
@@ -124,6 +133,10 @@ module.exports = new GraphQLSchema({
 			feedback: {
 				type: feedbackMutation,
 				resolve: () => Feedback
+			},
+			resourceMessage: {
+				type: resourceMessageMutation,
+				resolve: () => ResourceMessage
 			}
 		}
 	})

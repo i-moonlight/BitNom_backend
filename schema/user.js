@@ -6,7 +6,8 @@ const {
 	GraphQLString,
 	GraphQLNonNull,
 	GraphQLList,
-	GraphQLInt
+	GraphQLInt,
+	GraphQLID
 } = require("graphql");
 
 const { paginationInput } = require("./input-types");
@@ -86,6 +87,17 @@ const userQuery = new GraphQLObjectType({
 		me: {
 			type: userType,
 			description: "Returns the currently logged in user."
+		},
+		snapshot: {
+			type: userType,
+			description: "Get a user's minimum details.",
+			args: {
+				_id: {
+					type: GraphQLNonNull(GraphQLID),
+					description: `
+						If provided, the user with a matching Id is returned.`
+				},
+			}
 		},
 		search: {
 			type: GraphQLList(userType),
