@@ -21,4 +21,5 @@ module.exports = () => {
 	require("./technology-thread");
 	require("./message");
 	require("./feedback");
+	require("./resource-message");
 };

@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const auth = require("../common/auth");
 
 module.exports = {
-	create({ resource, type }, req) {
+	respond({ resource, type }, req) {
 		return (
 			auth
 				.loginRequired(req)
@@ -12,7 +12,7 @@ module.exports = {
 				.then(() => {
 					return mongoose
 						.model("Feedback")
-						.find({ resource, respondent: req.user._id });
+						.findOne({ resource, respondent: req.user._id });
 				})
 				// update feedback if exists
 				// reject to prevent further processing
@@ -22,46 +22,51 @@ module.exports = {
 						return feedback
 							.save()
 							.then(feedback =>
-								Promise.reject(
-									new Error(
-										"xxxxx" + JSON.stringify(feedback)
-									)
-								)
+								Promise.reject(new Error("xxxxx"))
 							);
 					}
 				})
 				// fetch the associated resource
 				.then(() => {
-					const modelsWithFeedback = ["Thread"];
-					return modelsWithFeedback
-						.map(model => mongoose.model(model).findById(resource))
-						.map(function() {
-							return Array.concat.apply([], arguments);
-						});
+					const modelsWithFeedback = [
+						"CoinThread",
+						"ResourceMessage"
+					];
+					return Promise.all(
+						modelsWithFeedback.map(model =>
+							mongoose.model(model).findById(resource)
+						)
+					).then(function() {
+						return arguments[0][0];
+					});
 				})
 				// reject if resource does not exist
 				.then(savedResource => {
+					console.log(savedResource);
 					if (!savedResource)
 						return Promise.reject(
-							"Specified resource does not exist"
+							new Error("Specified resource does not exist")
 						);
 					return savedResource.user;
 				})
 				// create new feedback entry
 				.then(resourceOwner => {
-					return mongoose.model("Feedback").create({
-						respondent: req.user._id,
-						resource,
-						resourceOwner,
-						type,
-						date: new Date()
-					});
+					return mongoose
+						.model("Feedback")
+						.create({
+							respondent: req.user._id,
+							resource,
+							resourceOwner,
+							type,
+							date: new Date()
+						})
+						.then(() => true);
 				})
 				// transform feedback updates rejects into a feedback object
 				// propagate all other rejects
 				.catch(error => {
 					if (error.message.indexOf("xxxxx") === 0) {
-						return JSON.parse(error.message.replace("xxxxx", ""));
+						return true;
 					}
 					return Promise.reject(error);
 				})
@@ -71,7 +76,7 @@ module.exports = {
 		const types = ["upvote", "downvote", "flag"];
 		return Promise.all(
 			types.map(type =>
-				mongoose.model("Feedback").count({ resource, type })
+				mongoose.model("Feedback").countDocuments({ resource, type })
 			)
 		).then(([upvotes, downvotes, flags]) => ({
 			upvotes,

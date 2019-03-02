@@ -23,6 +23,15 @@ module.exports = {
 					.skip(pagination.skip || 0);
 			});
 	},
+	snapshot({ _id }, req) {
+		return mongoose.model("User").findById(_id, { avatar: 1, displayName: 1, credits: 1 })
+		.then(user => {
+			if (!user) {
+				return Promise.reject(new Error("Requested user does not exist!"));
+			}
+			return user;
+		});
+	},
 	count({ params }, req) {
 		return auth.then(() => mongoose.model("Thread").count(params));
 	},

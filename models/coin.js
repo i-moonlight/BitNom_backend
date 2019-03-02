@@ -7,8 +7,6 @@ const schema = mongoose.Schema({
 	name: { type: String },
 	abbreviation: { type: String },
 	logo: { type: String },
-	about: { type: String },
-	description: { type: String },
 	topic: {
 		title: { type: String },
 		link: { type: String, unique: true },
@@ -34,16 +32,43 @@ const schema = mongoose.Schema({
 		parsed: { type: Boolean, default: false }
 	},
 	github: {
-		watch: { type: Number },
-		stars: { type: Number },
-		forks: { type: Number },
-		issues: { type: Number },
-		pulls: { type: Number },
-		commits: { type: Number },
-		branches: { type: Number },
-		releases: { type: Number },
-		contributors: { type: Number },
-		link: { type: String }
+		link: { type: String },
+		shortDescription: { type: String },
+		description: { type: String },
+		updateTime: { type: Date },
+		primaryLanguage: {
+			name: { type: String },
+			color: { type: String }
+		},
+		languages: [
+			{
+				name: { type: String },
+				color: { type: String }
+			}
+		],
+		createdAt: { type: Date },
+		pushedAt: { type: Date },
+		isFork: { type: Boolean },
+		isArchived: { type: Boolean },
+		isPrivate: { type: Boolean },
+		dynamic: [
+			{
+				watch: { type: Number },
+				stars: { type: Number },
+				forks: { type: Number },
+				openIssues: { type: Number },
+				closedIssues: { type: Number },
+				openPullRequests: { type: Number },
+				closedPullRequests: { type: Number },
+				openProjects: { type: Number },
+				closedProjects: { type: Number },
+				commits: { type: Number },
+				branches: { type: Number },
+				releases: { type: Number },
+				contributors: { type: Number },
+				date: { type: Date }
+			}
+		]
 	}
 });
 

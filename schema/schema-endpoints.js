@@ -14,5 +14,6 @@ module.exports = {
 	coin: ["get", "search", "votes", "vote"],
 	thread: ["create", "update", "delete", "get", "count"],
 	technology: ["get", "search", "votes", "create", "delete", "update"],
-	accessGroup: ["get", "create", "delete", "deletePermission", "update"]
+	accessGroup: ["get", "create", "delete", "deletePermission", "update"],
+	resourceMessage: ["get", "create"]
 };

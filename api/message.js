@@ -46,6 +46,16 @@ module.exports = {
 					.model("Message")
 					.updateMany({ _id: { $in: ids } }, { read: true })
 					.then(() => messages);
+			})
+			.then(receivedMessages => {
+				return mongoose
+					.model("Message")
+					.find({ sender: req.user._id, recipient: sender })
+					.limit(pagination.limit || 20)
+					.skip(pagination.skip || 0)
+					.then(sentMessages =>
+						sentMessages.concat(receivedMessages)
+					);
 			});
 	},
 	unreadPerUser(_, req) {

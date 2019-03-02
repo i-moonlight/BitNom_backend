@@ -12,5 +12,6 @@ module.exports = {
 	CoinThread: require("./thread")("CoinThread"),
 	TechnologyThread: require("./thread")("TechnologyThread"),
 	Message: require("./message"),
-	Feedback: require("./feedback")
+	Feedback: require("./feedback"),
+	ResourceMessage: require("./resource-message")
 };
