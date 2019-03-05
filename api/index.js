@@ -13,5 +13,6 @@ module.exports = {
 	TechnologyThread: require("./thread")("TechnologyThread"),
 	Message: require("./message"),
 	Feedback: require("./feedback"),
-	ResourceMessage: require("./resource-message")
+	ResourceMessage: require("./resource-message"),
+	Contribution: require("./contribution")
 };
