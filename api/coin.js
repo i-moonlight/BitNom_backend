@@ -64,10 +64,12 @@ function updateCoinsDetails(coins) {
 								data.repository.shortDescriptionHTML;
 							coin.github.description =
 								data.repository.descriptionHTML;
-							coin.github.primaryLanguage.name =
-								data.repository.primaryLanguage.name;
-							coin.github.primaryLanguage.color =
-								data.repository.primaryLanguage.color;
+							if (coin.github.primaryLanguage) {
+								coin.github.primaryLanguage.name =
+									data.repository.primaryLanguage.name;
+								coin.github.primaryLanguage.color =
+									data.repository.primaryLanguage.color;
+							}
 							coin.github.languages =
 								data.repository.languages.nodes;
 							coin.github.createdAt = data.repository.createdAt;

@@ -20,7 +20,8 @@ const {
 	CoinThread,
 	Message,
 	Feedback,
-	ResourceMessage
+	ResourceMessage,
+	Contribution
 } = require("../api");
 
 const { coinQuery, coinMutation } = require("./coin");
@@ -34,6 +35,7 @@ const {
 	resourceMessageQuery,
 	resourceMessageMutation
 } = require("./resource-message");
+const { contributionQuery } = require("./contribution");
 
 const schemaEndpoints = require("./schema-endpoints");
 
@@ -80,6 +82,10 @@ module.exports = new GraphQLSchema({
 			resourceMessage: {
 				type: resourceMessageQuery,
 				resolve: () => ResourceMessage
+			},
+			contribution: {
+				type: contributionQuery,
+				resolve: () => Contribution
 			},
 			login: {
 				type: GraphQLString,

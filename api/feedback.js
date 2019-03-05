@@ -49,6 +49,17 @@ module.exports = {
 						);
 					return savedResource.user;
 				})
+				// reject if logged in user is resource owner
+				.then(resourceOwner => {
+					if (String(resourceOwner) === String(req.user._id)) {
+						return Promise.reject(
+							new Error(
+								"You cannot provide feedback on owned resource!"
+							)
+						);
+					}
+					return resourceOwner;
+				})
 				// create new feedback entry
 				.then(resourceOwner => {
 					return mongoose
