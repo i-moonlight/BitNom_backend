@@ -27,7 +27,7 @@ module.exports = {
 	create({ technology }, req) {
 		technology.follows = 0;
 		technology.date = new Date();
-		technology.user = "5bab3fba9927f84421ee9103";
+		technology.user = req.user._id;
 		return auth
 			.loginRequired(req)
 			.then(() => auth.hasPermission(req, "technology", "create"))
