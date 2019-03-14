@@ -37,6 +37,7 @@ module.exports = {
 							mongoose.model(model).findById(resource)
 						)
 					).then(function() {
+						console.log(arguments);
 						return arguments[0][0];
 					});
 				})
