@@ -2,9 +2,13 @@
 
 BitNorm web application backend code.
 Post-receive hook test 3.
+# How Run Backend 
 
+- You will need to install node version v10.15.3 
+- npm install
+- npm start it will run on (http://localhost:3000/)
 ## todo
-
+```
 [X] Create endpoint to fetch complete coins
 [X] Create endpoint to fetch partial coins
 [X] Create users schema
@@ -37,7 +41,7 @@ Post-receive hook test 3.
 [ ] Blog support under team's subdomain
 [ ] RSS support under team's subdomain
 [ ] Source code development / repository support under team's subdomain
-
+```
 ## Clarification needed
 
 -   Allow for hiring of developers
